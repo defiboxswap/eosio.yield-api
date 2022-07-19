@@ -1,0 +1,143 @@
+'use strict';
+const BaseController = require('../base_controller');
+/**
+ * @Controller protocols
+ */
+class ProtocolsController extends BaseController {
+
+  
+  /**
+   * @Summary Get protocols
+   * @Router get /v1/protocols
+   * @Request query number pageNo eg:1
+   * @Request query number pageSize eg:100
+   * @Request query string search eg:swap
+   * @Request query string category
+   * @Request query string status enum:pending,active,denied
+   * @Request query string order enum:tvl_usd,tvl_usd_change,agg_rewards,create_at
+   * @response 0 protocol resp
+   */
+  async protocol_page() {
+    const { app, ctx } = this;
+    const db = app.mysql.get('yield');
+    const rules = {
+      pageNo: { type: 'number', required: false },
+      pageSize: { type: 'number', required: false },
+      search: { type: 'string', trim: true, required: false },
+      category: { type: 'string', trim: true, required: false },
+      status: { type: 'string', trim: true, required: false, values: [ 'pending', 'active', 'denied' ] },
+      order: { type: 'enum', trim: true, required: false, values: [ 'tvl_usd', 'tvl_usd_change', 'agg_rewards', 'create_at' ] },
+    };
+    const params = {
+      pageNo: ctx.request.query.pageNo ? parseInt(ctx.request.query.pageNo) : 1,
+      pageSize: ctx.request.query.pageSize ? parseInt(ctx.request.query.pageSize) : 100,
+      search: ctx.request.query.search,
+      category: ctx.request.query.category,
+      status: ctx.request.query.status,
+      order: ctx.request.query.order || 'tvl_usd',
+    };
+    // validate
+    ctx.validate(rules, params);
+    // Limit the maximum number of rows
+    if (params.pageSize > 300) params.pageSize = 300;
+
+    let sql = 'select * from protocol where is_delete = 0 ';
+    if (params.search) {
+      sql += ' and metadata_name like :search ';
+    }
+    if (params.category) {
+      sql += ' and category = :category ';
+    } 
+    if (params.status) {
+      sql += ' and status = :status ';
+    }
+    sql += ` order by ${params.order} desc limit :offset, :limit `;
+    const data = await db.query(sql,
+      {
+        search: '%' + params.search + '%',
+        status: params.status,
+        category: params.category,
+        offset: (params.pageNo - 1) * params.pageSize,
+        limit: params.pageSize,
+      }
+    );
+
+    super.success(data);
+  }
+
+  /**
+   * @Summary Get protocol detail.
+   * @Router get /v1/protocols/{name}
+   * @Request path string *name eg:swap.defi
+   * @response 0 protocol resp
+  **/
+  async protocol_show() {
+    const { app, ctx } = this;
+    const db = app.mysql.get('yield');
+    const rules = {
+      name: { type: 'string', required: true },
+    };
+    const params = {
+      name: ctx.params.name,
+    };
+    ctx.validate(rules, params);
+
+    const data = await db.get('protocol', { name: params.name });
+    if (data) {
+      const rankResult = await db.queryOne('select count(*) + 1 rank from protocol where is_delete = 0 and tvl_eos > ?', 
+      [ data.tvl_eos]);
+      data.rank = rankResult.rank;
+    }
+    super.success(data);
+  }
+
+  /**
+     * @Summary Get current protocol category stats.
+     * @Router get /v1/protocol/categorystats
+     * @response 0 protocolt_category_stat resp
+    **/
+  async protocol_category_stat_list() {
+    const { app } = this;
+    const db = app.mysql.get('yield');
+    const data = await db.select('protocol_category_stat');
+    super.success(data);
+  }
+
+  /**
+     * @Summary Get protocol category stat detail.
+     * @Router get /v1/protocol/categorystats/{category}
+     * @Request query string *category eg:swap
+     * @response 0 protocolt_category_stat resp
+    **/
+  async protocol_category_stat_show() {
+    const { app, ctx } = this;
+    const db = app.mysql.get('yield');
+    const rules = {
+      category: { type: 'string', required: true },
+    };
+    const params = {
+      category: ctx.request.query.category,
+    };
+    // validate
+    ctx.validate(rules, params);
+
+    const data = await db.get('protocol_category_stat', { category: params.category });
+    super.success(data);
+  }
+
+
+  /**
+ * @Summary Get current protocol stat.
+ * @Router get /v1/protocol/stat
+ * @response 0 protocol_stat resp
+**/
+  async protocol_stat_show() {
+    const { app } = this;
+    const db = app.mysql.get('yield');
+    const data = await db.get('protocol_stat');
+    super.success(data);
+  }
+
+}
+
+module.exports = ProtocolsController;
