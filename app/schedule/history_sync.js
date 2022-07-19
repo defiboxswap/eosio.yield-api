@@ -12,7 +12,7 @@ class history_sync extends Subscription {
   static get schedule() {
     return {
       type: 'worker',
-      disable: true,
+      disable: false,
       immediate: true,
     };
   }
