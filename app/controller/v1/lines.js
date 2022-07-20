@@ -30,7 +30,7 @@ class LinesController extends BaseController {
 
   /**
    * @Summary Get lines for protocol stat.
-   * @Router get /v1/line/{duration}/stats
+   * @Router get /v1/lines/{duration}/stats
    * @Request path string *duration enum:day,8h
    * @response 0 line_stat resp
    **/
@@ -50,7 +50,7 @@ class LinesController extends BaseController {
 
   /**
    * @Summary Get lines for protocol category stat.
-   * @Router get /v1/line/{duration}/categorystats
+   * @Router get /v1/lines/{duration}/categorystats
    * @Request query string category
    * @Request path string *duration enum:day,8h
    * @response 0 line_category_stat resp

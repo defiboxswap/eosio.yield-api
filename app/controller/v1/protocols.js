@@ -93,7 +93,7 @@ class ProtocolsController extends BaseController {
 
   /**
      * @Summary Get current protocol category stats.
-     * @Router get /v1/protocol/categorystats
+     * @Router get /v1/protocols/categorystats
      * @response 0 protocolt_category_stat resp
     **/
   async protocol_category_stat_list() {
@@ -105,8 +105,8 @@ class ProtocolsController extends BaseController {
 
   /**
      * @Summary Get protocol category stat detail.
-     * @Router get /v1/protocol/categorystats/{category}
-     * @Request query path *category protocol category
+     * @Router get /v1/protocols/categorystats/{category}
+     * @Request path string *category protocol category
      * @response 0 protocolt_category_stat resp
     **/
   async protocol_category_stat_show() {
@@ -128,7 +128,7 @@ class ProtocolsController extends BaseController {
 
   /**
  * @Summary Get current protocol stat.
- * @Router get /v1/protocol/stat
+ * @Router get /v1/protocols/stat
  * @response 0 protocol_stat resp
 **/
   async protocol_stat_show() {

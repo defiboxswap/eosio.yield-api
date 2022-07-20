@@ -83,7 +83,7 @@ class LineService extends Service {
     // get latest line
     sql = 'select * from protocol_category_stat where period > 0 '
     if (params.category) {
-      sql += ' and cagetory = :category '
+      sql += ' and category = :category '
     }
     const latest_result = await db.query(sql, { category: params.category });
     for (const item of latest_result) {

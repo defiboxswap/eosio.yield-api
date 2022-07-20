@@ -30,7 +30,7 @@ class EchartController extends BaseController {
   
   /**
    * @Summary Get echart data for protocol category stat.
-   * @Router get /v1/echart/line/{duration}/categorystats
+   * @Router get /v1/echart/lines/{duration}/categorystats
    * @Request path string *duration enum:day,8h
    * @response 0 chart_result resp
   **/
