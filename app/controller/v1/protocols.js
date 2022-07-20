@@ -9,10 +9,10 @@ class ProtocolsController extends BaseController {
   /**
    * @Summary Get protocols
    * @Router get /v1/protocols
-   * @Request query number pageNo eg:1
-   * @Request query number pageSize eg:100
-   * @Request query string search eg:swap
-   * @Request query string category
+   * @Request query number pageNo page no
+   * @Request query number pageSize page size
+   * @Request query string search fuzzy search metadata name
+   * @Request query string category protocol category
    * @Request query string status enum:pending,active,denied
    * @Request query string order enum:tvl_usd,tvl_usd_change,agg_rewards,create_at
    * @response 0 protocol resp
@@ -68,7 +68,7 @@ class ProtocolsController extends BaseController {
   /**
    * @Summary Get protocol detail.
    * @Router get /v1/protocols/{name}
-   * @Request path string *name eg:swap.defi
+   * @Request path string *name protocol name
    * @response 0 protocol resp
   **/
   async protocol_show() {
@@ -106,7 +106,7 @@ class ProtocolsController extends BaseController {
   /**
      * @Summary Get protocol category stat detail.
      * @Router get /v1/protocol/categorystats/{category}
-     * @Request query string *category eg:swap
+     * @Request query path *category protocol category
      * @response 0 protocolt_category_stat resp
     **/
   async protocol_category_stat_show() {
@@ -116,7 +116,7 @@ class ProtocolsController extends BaseController {
       category: { type: 'string', required: true },
     };
     const params = {
-      category: ctx.request.query.category,
+      category: ctx.params.category,
     };
     // validate
     ctx.validate(rules, params);

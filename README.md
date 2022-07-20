@@ -1,11 +1,13 @@
 # config
 This framework supports loading configuration according to the environment and defining configuration files of multiple environments. For more details, please check env.
 
+```
 config
 |- config.default.js
 |- config.prod.js
 |- config.test.js
 |- config.local.js
+```
 
 configure mysql connection 
 ```js

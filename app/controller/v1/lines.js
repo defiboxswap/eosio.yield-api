@@ -8,7 +8,7 @@ class LinesController extends BaseController {
   /**
    * @Summary Get lines for protocol.
    * @Router get /v1/lines/{duration}
-   * @Request query string name eg: swap.defi
+   * @Request query string name protocol name
    * @Request path string *duration enum:day,8h
    * @response 0 line resp
    **/
