@@ -5,8 +5,6 @@
  */
 module.exports = app => {
   const { router, controller } = app;
-  router.get('/', controller.home.index);
-
   router.get('/v1/nodes', controller.v1.node.list);
 
   router.get('/v1/protocols', controller.v1.protocols.protocol_page);

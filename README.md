@@ -44,7 +44,7 @@ module.exports = {
 
 # toeknyield
 
-Tokenyield history processing logic
+EOS Yield+ history processing logic
 
 ## QuickStart
 

@@ -1,7 +1,7 @@
 {
-  "name": "tokenyield-api",
+  "name": "eosyield-api",
   "version": "1.0.0",
-  "description": "tokenyield history processing logic and api",
+  "description": "EOS Yield+ history processing logic and api",
   "private": true,
   "egg": {
     "declarations": true
@@ -30,9 +30,9 @@
     "node": ">=10.0.0"
   },
   "scripts": {
-    "start": "egg-scripts start --daemon --title=tokenyield-api --port 5051",
-    "start-test": "egg-scripts start --env=test --workers=2 --daemon --title=tokenyield-api --port 5051",
-    "stop": "egg-scripts stop --title=tokenyield-api",
+    "start": "egg-scripts start --daemon --title=eosyield-api --port 5051",
+    "start-test": "egg-scripts start --env=test --workers=2 --daemon --title=eosyield-api --port 5051",
+    "stop": "egg-scripts stop --title=eosyield-api",
     "dev": "egg-bin dev --port 5051",
     "debug": "egg-bin debug --port 5051",
     "test": "npm run lint -- --fix && npm run test-local",
@@ -49,6 +49,6 @@
     "type": "git",
     "url": ""
   },
-  "author": "tokenyield",
+  "author": "eosyield",
   "license": "MIT"
 }

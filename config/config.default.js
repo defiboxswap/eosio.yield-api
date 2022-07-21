@@ -37,8 +37,7 @@ module.exports = appInfo => {
     enable: false,
     apiInfo: {
       version: '1.0.0',
-      title: 'Tokenyield Functions',
-      description: 'Tokenyield Api',
+      title: 'EOS Yield+ Functions',
       contact: {
         email: 'raven@defibox.io',
       },
