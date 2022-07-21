@@ -11,7 +11,7 @@ class EchartController extends BaseController {
    * @Summary Get echart data for protocol.
    * @Router get /v1/echart/lines/{duration}
    * @Request path string *duration enum:day,8h
-   * @response 0 chart_result resp
+   * @response 200 chart_result resp
   **/
   async list() {
     const { ctx } = this;
@@ -32,7 +32,7 @@ class EchartController extends BaseController {
    * @Summary Get echart data for protocol category stat.
    * @Router get /v1/echart/lines/{duration}/categorystats
    * @Request path string *duration enum:day,8h
-   * @response 0 chart_result resp
+   * @response 200 chart_result resp
   **/
   async category_stat_list() {
     const { ctx } = this;

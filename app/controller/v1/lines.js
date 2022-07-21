@@ -10,7 +10,7 @@ class LinesController extends BaseController {
    * @Router get /v1/lines/{duration}
    * @Request query string name protocol name
    * @Request path string *duration enum:day,8h
-   * @response 0 line resp
+   * @response 200 line resp
    **/
   async list() {
     const { ctx } = this;
@@ -32,7 +32,7 @@ class LinesController extends BaseController {
    * @Summary Get lines for protocol stat.
    * @Router get /v1/lines/{duration}/stats
    * @Request path string *duration enum:day,8h
-   * @response 0 line_stat resp
+   * @response 200 line_stat resp
    **/
   async stat_list() {
     const { ctx } = this;
@@ -53,7 +53,7 @@ class LinesController extends BaseController {
    * @Router get /v1/lines/{duration}/categorystats
    * @Request query string category
    * @Request path string *duration enum:day,8h
-   * @response 0 line_category_stat resp
+   * @response 200 line_category_stat resp
    **/
   async category_stat_list() {
     const { ctx } = this;

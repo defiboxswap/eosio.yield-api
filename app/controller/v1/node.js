@@ -10,7 +10,7 @@ class NodeController extends BaseController {
   /**
    * @Summary Get nodes.
    * @Router get /v1/nodes
-   * @response 0 chain_node resp
+   * @response 200 chain_node resp
   **/
   async list() {
     const { app } = this;

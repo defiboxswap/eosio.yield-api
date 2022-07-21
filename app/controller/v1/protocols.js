@@ -15,7 +15,7 @@ class ProtocolsController extends BaseController {
    * @Request query string category protocol category
    * @Request query string status enum:pending,active,denied
    * @Request query string order enum:tvl_usd,tvl_usd_change,agg_rewards,create_at
-   * @response 0 protocol resp
+   * @response 200 protocol resp
    */
   async protocol_page() {
     const { app, ctx } = this;
@@ -69,7 +69,7 @@ class ProtocolsController extends BaseController {
    * @Summary Get protocol detail.
    * @Router get /v1/protocols/{name}
    * @Request path string *name protocol name
-   * @response 0 protocol resp
+   * @response 200 protocol resp
   **/
   async protocol_show() {
     const { app, ctx } = this;
@@ -94,7 +94,7 @@ class ProtocolsController extends BaseController {
   /**
      * @Summary Get current protocol category stats.
      * @Router get /v1/protocols/categorystats
-     * @response 0 protocolt_category_stat resp
+     * @response 200 protocolt_category_stat resp
     **/
   async protocol_category_stat_list() {
     const { app } = this;
@@ -107,7 +107,7 @@ class ProtocolsController extends BaseController {
      * @Summary Get protocol category stat detail.
      * @Router get /v1/protocols/categorystats/{category}
      * @Request path string *category protocol category
-     * @response 0 protocolt_category_stat resp
+     * @response 200 protocolt_category_stat resp
     **/
   async protocol_category_stat_show() {
     const { app, ctx } = this;
@@ -129,7 +129,7 @@ class ProtocolsController extends BaseController {
   /**
  * @Summary Get current protocol stat.
  * @Router get /v1/protocols/stat
- * @response 0 protocol_stat resp
+ * @response 200 protocol_stat resp
 **/
   async protocol_stat_show() {
     const { app } = this;
