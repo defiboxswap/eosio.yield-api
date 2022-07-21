@@ -38,6 +38,7 @@ module.exports = appInfo => {
     apiInfo: {
       version: '1.0.0',
       title: 'EOS Yield+ Functions',
+      description: 'EOS Yield+ Api',
       contact: {
         email: 'raven@defibox.io',
       },
