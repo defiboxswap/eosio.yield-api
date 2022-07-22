@@ -30,6 +30,7 @@ class LineService extends Service {
     if (params.name) {
       sql += ' and name = :name '
     }
+    sql += ' order by period asc'
     const latest_result = await db.query(sql, { name: params.name });
 
     const result = [...history_result];
@@ -103,6 +104,7 @@ class LineService extends Service {
     if (params.category) {
       sql += ' and category = :category '
     }
+    sql += ' order by period asc'
     const latest_result = await db.query(sql, { category: params.category });
 
     const result = [...history_result];
