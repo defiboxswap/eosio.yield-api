@@ -16,7 +16,7 @@ class LineService extends Service {
     const { app, ctx } = this;
     const db = app.mysql.get('yield');
     const from = this.getFrom(params.duration);
-    const cache_key = JSON.stringify({from, ...params});
+    const cache_key = JSON.stringify({query_name: "line_protocol", from, ...params});
     // get history line
     let result = await ctx.service.cache.lru_computeIfAbsent( cache_key, async () => {
       let sql = `select * from line_protocol_${params.duration} where line_id >= :from `;
@@ -52,7 +52,7 @@ class LineService extends Service {
     const { app, ctx } = this;
     const db = app.mysql.get('yield');
     const from = this.getFrom(params.duration);
-     const cache_key = JSON.stringify({from, ...params});
+     const cache_key = "protocol_stat_line_query_" + JSON.stringify({query_name: "line_protocol_stat", from, ...params});
     // get history line
     let result = await ctx.service.cache.lru_computeIfAbsent( cache_key, async () => {
       let sql = `select * from line_protocol_stat_${params.duration} where line_id >= :from `;
@@ -85,7 +85,7 @@ class LineService extends Service {
     const db = app.mysql.get('yield');
     const from = this.getFrom(params.duration);
     // get history line
-    const cache_key = JSON.stringify({from, ...params});
+    const cache_key = JSON.stringify({query_name: "line_protocol_category", from, ...params});
     let result = await ctx.service.cache.lru_computeIfAbsent( cache_key, async () => {
       let sql = `select * from line_protocol_category_stat_${params.duration} where line_id >= :from `;
       if (params.category) {
