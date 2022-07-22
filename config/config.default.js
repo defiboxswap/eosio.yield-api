@@ -10,7 +10,7 @@ module.exports = appInfo => {
    * built-in config
    * @type {Egg.EggAppConfig}
    **/
-  const config = exports = {};
+  const config = (exports = {});
 
   // use for cookie sign key, should change to your own and keep security
   config.keys = appInfo.name + '_1653875977514_1416';
@@ -33,7 +33,7 @@ module.exports = appInfo => {
     // myAppName: 'egg',
   };
   config.swaggerdoc = {
-    schemes: [ 'http' ],
+    schemes: [],
     enable: false,
     apiInfo: {
       version: '1.0.0',
@@ -43,6 +43,30 @@ module.exports = appInfo => {
         email: 'raven@defibox.io',
       },
     },
+  };
+  config.lru = {
+    enable: true,
+
+    // for use with tracking overall storage size
+    maxSize: 5000,
+    sizeCalculation: (value, key) => {
+      return 1;
+    },
+
+    // for use when you need to clean up something when objects
+    // are evicted from the cache
+    dispose: (value, key) => {
+      freeFromMemoryOrWhatever(value);
+    },
+
+    // how long to live in ms
+    ttl: 1000 * 60 * 60 * 24,
+
+    // return stale items before removing from cache?
+    allowStale: false,
+
+    updateAgeOnGet: false,
+    updateAgeOnHas: false,
   };
   return {
     ...config,

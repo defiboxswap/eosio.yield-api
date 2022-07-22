@@ -13,16 +13,20 @@ class LineService extends Service {
    * @param  duration enum:day,8h
    **/
   async list(params) {
-    const { app } = this;
+    const { app, ctx } = this;
     const db = app.mysql.get('yield');
     const from = this.getFrom(params.duration);
-    let sql = `select * from line_protocol_${params.duration} where line_id >= :from `;
-    if (params.name) {
-      sql += ' and name = :name';
-    }
-    const result = await db.query(sql, { from, name: params.name });
+    const cache_key = JSON.stringify({from, ...params});
+    // get history line
+    let result = await ctx.service.cache.lru_computeIfAbsent( cache_key, async () => {
+      let sql = `select * from line_protocol_${params.duration} where line_id >= :from `;
+      if (params.name) {
+        sql += ' and name = :name';
+      }
+      return await db.query(sql, { from, name: params.name });
+    });
     // get latest line
-    sql = 'select * from protocol where is_delete = 0 and period > 0 '
+    let sql = 'select * from protocol where is_delete = 0 and period > 0 '
     if (params.name) {
       sql += ' and name = :name '
     }
@@ -45,13 +49,18 @@ class LineService extends Service {
    * @param  duration enum:day,8h
    **/
   async stat_list(params) {
-    const { app } = this;
+    const { app, ctx } = this;
     const db = app.mysql.get('yield');
     const from = this.getFrom(params.duration);
-    let sql = `select * from line_protocol_stat_${params.duration} where line_id >= :from `;
-    const result = await db.query(sql, { from });
+     const cache_key = JSON.stringify({from, ...params});
+    // get history line
+    let result = await ctx.service.cache.lru_computeIfAbsent( cache_key, async () => {
+      let sql = `select * from line_protocol_stat_${params.duration} where line_id >= :from `;
+      return await db.query(sql, { from });
+    });
+    
     // get latest line
-    sql = 'select * from protocol_stat where period > 0 '
+    let sql = 'select * from protocol_stat where period > 0 '
     const latest_result = await db.query(sql, { });
     for (const item of latest_result) {
       result.push({
@@ -72,16 +81,21 @@ class LineService extends Service {
    * @param  duration enum:day,8h
    **/
   async category_stat_list(params) {
-    const { app } = this;
+    const { app, ctx } = this;
     const db = app.mysql.get('yield');
     const from = this.getFrom(params.duration);
-    let sql = `select * from line_protocol_category_stat_${params.duration} where line_id >= :from `;
-    if (params.category) {
-      sql += ' and category = :category';
-    }
-    const result = await db.query(sql, { from, category: params.category });
+    // get history line
+    const cache_key = JSON.stringify({from, ...params});
+    let result = await ctx.service.cache.lru_computeIfAbsent( cache_key, async () => {
+      let sql = `select * from line_protocol_category_stat_${params.duration} where line_id >= :from `;
+      if (params.category) {
+        sql += ' and category = :category';
+      }
+      return await db.query(sql, { from, category: params.category });
+    });
+
     // get latest line
-    sql = 'select * from protocol_category_stat where period > 0 '
+    let sql = 'select * from protocol_category_stat where period > 0 '
     if (params.category) {
       sql += ' and category = :category '
     }
@@ -101,13 +115,16 @@ class LineService extends Service {
     return result;
   }
 
+  // day Queries the data of the last 365 days    (31536000 seconds)
+  // 8h  Queries the data of the last 180 days    (15552000 seconds)
+  // 10m Queries the data of the last 15  days    (1296000  seconds)
   getFrom(duration) {
     if (duration === 'day') {
-      return moment().subtract(1, 'years').unix();
+      return convert_now_line_id(duration) - 31536000;
     } else if (duration === '8h') {
-      return moment().subtract(6, 'months').unix();
+      return convert_now_line_id(duration) - 15552000;
     } else if (duration === '10m') {
-      return moment().subtract(15, 'days').unix();
+      return convert_now_line_id(duration) - 1296000;
     }
   }
 }

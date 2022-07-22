@@ -1,10 +1,19 @@
 'use strict';
+const LRU = require('lru-cache')
 const { sleep } = require('./app/lib/utils/util');
 
 
 class AppBootHook {
   constructor(app) {
     this.app = app;
+  }
+  
+  async didLoad() {
+    const { app } = this;
+    // init lru cache
+    if (app.config.lru.enable) {
+      app.lru = new LRU(app.config.lru);
+    }
   }
 
   async didReady() {
