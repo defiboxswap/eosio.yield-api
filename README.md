@@ -29,6 +29,13 @@ module.exports = {
         user: '',
         password: '',
         database: 'yield',
+        typeCast:function (field, next) {
+          if (field.type === "JSON") {
+            return JSON.parse(field.string());
+          } else {
+            return next();
+          }
+        },
       },
     },
     default: {

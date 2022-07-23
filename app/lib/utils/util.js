@@ -71,12 +71,12 @@ exports.sleep = ms => {
  * Obtain the last line ID corresponding to the time
  * if date = undefined Take the current time
  * if date = 0 Take the current time
- * @param {*} type 
- * @param {*} date 
- * @returns 
+ * @param {*} type
+ * @param {*} date
+ * @returns
  */
 exports.convert_last_line_id = (type, date = undefined) => {
-  if(date === 0){
+  if (date === 0) {
     date = undefined;
   }
   if (date) {
@@ -101,12 +101,12 @@ exports.convert_last_line_id = (type, date = undefined) => {
  * Obtain the line ID corresponding to the time
  * if date = undefined Take the current time
  * if date = 0 Take the current time
- * @param {*} type 
- * @param {*} date 
- * @returns 
+ * @param {*} type
+ * @param {*} date
+ * @returns
  */
 exports.convert_now_line_id = (type, date = undefined) => {
-  if(date === 0){
+  if (date === 0) {
     date = undefined;
   }
   if (date) {
@@ -147,4 +147,18 @@ exports.get_metadata_value = (metadata, key) => {
     }
   }
   return '';
+};
+
+/**
+ * convert array to map
+ * @param {array} arr
+ */
+exports.array_to_map = arr => {
+  const result = {};
+  if (arr) {
+    for (const item of arr) {
+      result[item.key] = item.value;
+    }
+  }
+  return result;
 };

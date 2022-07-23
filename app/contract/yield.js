@@ -1,7 +1,8 @@
 'use strict';
 module.exports = {
   protocol: {
-    name: { type: 'string', description: 'The protocol name', example: 'swap.defi', },
+    id: { type: 'number', description: 'The row id', example: 1 },
+    name: { type: 'string', description: 'The protocol name', example: 'swap.defi' },
     category: { type: 'string', description: 'The category of protocol', example: 'dexes'},
     metadata_name: { type: 'string', description: 'The metadata name of protocol', example: 'Defibox swap'},
     tvl_eos: { type: 'number', description: 'The tvl of eos valuation', example: 7201852.2869},
@@ -10,17 +11,18 @@ module.exports = {
     tvl_usd_change: { type: 'number', description: 'tvl 24h change(usd valuation)', example: 152336.7599},
     agg_rewards: { type: 'number', description: 'The aggregate rewards', example: 16112.8371},
     agg_rewards_change: { type: 'number', description: 'The aggregate rewards 24h change', example: 827.6165},
-    agg_protocol_count: { type: 'number', description: 'The aggregate protocol count', example: 6},
-    contracts: { type: 'string', description: 'The additional supporting EOS contracts', example: '[ "swap.defi" ]'},
-    evm: { type: 'string', description: 'The additional supporting EVM contracts', example: '[]'},
-    metadata: { type: 'string', description: 'The protocol metadata', example: '[ { "key": "name", "value": "Defibox swap" }, { "key": "website", "value": "https://eos.defibox.io" } ]'},
+    contracts: { type: 'string', description: 'The additional supporting EOS contracts', example: [ "swap.defi" ]},
+    evm: { type: 'string', description: 'The additional supporting EVM contracts', example: []},
+    metadata: { type: 'string', description: 'The protocol metadata', example: {"name":"Danchor","url":"https://defibox.io/usn"}},
     balance: { type: 'number', description: 'The balance rewards', example: 23041.9849},
     claimed: { type: 'number', description: 'The claimed rewards', example: 0},
     status: { type: 'string', description: 'The protocol status: pending,active,denied', example: 'active'},
+    period: { type: 'number', description: 'The period time', example: 1658190600},
+    is_delete: { type: 'number', description: 'The delete status (1: deleted 0: not deleted)', example: 0},
     create_at: { type: 'number', description: 'The protocol create timestamp', example: 1655472145},
-    period: { type: 'number', description: 'The period update', example: 1658190600},
   },
   protocol_stat: {
+    id: { type: 'number', description: 'The row id', example: 1 },
     tvl_eos: { type: 'number', description: 'The tvl of eos valuation', example: 7201852.2869},
     tvl_usd: { type: 'number', description: 'The tvl of usd valuation', example: 7452485.8847},
     tvl_eos_change: { type: 'number', description: 'tvl 24h change(eos valuation)', example: -119427.7451},
@@ -29,8 +31,10 @@ module.exports = {
     agg_rewards_change: { type: 'number', description: 'The aggregate rewards 24h change', example: 827.6165},
     agg_protocol_count: { type: 'number', description: 'The aggregate protocol count', example: 6},
     claimed: { type: 'number', description: 'The claimed rewards', example: 0},
+    period: { type: 'number', description: 'The period time', example: 1658190600},
   },
   protocolt_category_stat: {
+    id: { type: 'number', description: 'The row id', example: 1 },
     category: { type: 'string', description: 'The category of protocol', example: 'dexes'},
     tvl_eos: { type: 'number', description: 'The tvl of eos valuation', example: 7201852.2869},
     tvl_usd: { type: 'number', description: 'The tvl of usd valuation', example: 7452485.8847},
@@ -40,6 +44,7 @@ module.exports = {
     agg_rewards_change: { type: 'number', description: 'The aggregate rewards 24h change', example: 827.6165},
     agg_protocol_count: { type: 'number', description: 'The aggregate protocol count', example: 6},
     claimed: { type: 'number', description: 'The claimed rewards', example: 0},
+    period: { type: 'number', description: 'The period time', example: 1658190600},
   },
   line: {
     line_id: { type: 'number', description: 'The timestamp', example: 1656288000},
@@ -75,13 +80,9 @@ module.exports = {
   chain_node: {
     chain: { type: 'string', description: 'The chain eg: wax eos', example: 'eos'},
     chain_id: { type: 'string', description: 'The chain id', example: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906'},
-    url: { type: 'string', description: 'The node url', example: 'https://eos.newdex.one'},
+    url: { type: 'string', description: 'The node url', example: 'https://eos.defibox.xyz'},
     area: { type: 'string', description: 'area', example: 'Hongkong'},
-    sort: { type: 'number', description: 'sort', example: 4},
-    status: { type: 'number', description: 'status(0-disable，1-enable)', example: 1},
     is_default: { type: 'number', description: 'The is default node', example: 0},
-    remark: { type: 'string', description: 'The aggregate rewards'},
-    language: { type: 'string', description: 'language en, zh_CN,zh_TW,ko', example: 'zh_TW,zh_CN'},
   },
   chart_result: {
     data: { type: 'string', description: "Two-dimensional array: The first argument is category", 

@@ -15,3 +15,8 @@ typings/
 pnpm-lock.yaml
 yarn.lock
 .github/
+
+config/config.local.js
+config/config.test.js
+config/config.prod.js
+.history/

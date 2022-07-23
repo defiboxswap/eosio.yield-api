@@ -19,7 +19,6 @@ class history_sync extends Subscription {
 
   async subscribe() {
     const { app, ctx } = this;
-    // TODO use kafka/rabbitmq
     const yield_db = ctx.app.mysql.get('yield');
     const history_db = ctx.app.mysql.get('history');
     if (app.globalStatus === 0 || local_status !== sync_status.start) return;

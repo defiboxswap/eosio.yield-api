@@ -42,7 +42,9 @@ class LineService extends Service {
         tvl_eos: item.tvl_eos,
         tvl_usd: item.tvl_usd,
         tvl_eos_change: item.tvl_eos_change,
-        tvl_usd_change: item.tvl_usd_change,
+        tvl_usd_change: item.tvl_usd_change, 
+        agg_rewards: item.agg_rewards,
+        agg_rewards_change: item.agg_rewards_change,
       });
     }
     return result;
@@ -76,6 +78,8 @@ class LineService extends Service {
         tvl_usd: item.tvl_usd,
         tvl_eos_change: item.tvl_eos_change,
         tvl_usd_change: item.tvl_usd_change,
+        agg_rewards: item.agg_rewards,
+        agg_rewards_change: item.agg_rewards_change,
       });
     }
     return result;
@@ -118,6 +122,8 @@ class LineService extends Service {
         tvl_usd: item.tvl_usd,
         tvl_eos_change: item.tvl_eos_change,
         tvl_usd_change: item.tvl_usd_change,
+        agg_rewards: item.agg_rewards,
+        agg_rewards_change: item.agg_rewards_change,
       });
     }
     return result;

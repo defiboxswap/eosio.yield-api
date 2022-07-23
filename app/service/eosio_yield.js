@@ -15,15 +15,16 @@ class LogService extends Service {
     const name = data.protocol;
     const category = data.category;
     const status = data.status;
-    const metadata = JSON.stringify(data.metadata);
-    const metadata_name = Util.get_metadata_value(data.metadata, 'name');
+    const metadata = Util.array_to_map(data.metadata || {});
+    const metadata_name = metadata.name;
     // carete protocol
     const row = {
       name,
       metadata_name,
-      metadata,
+      metadata: JSON.stringify(metadata),
       category,
       contracts: JSON.stringify([name]),
+      evm: '[]',
       status: ProtocolStatus.pending,
       is_delete: 0,
       create_at: moment(moment(action.timestamp).format('YYYY-MM-DD HH:mm:ss+00:00')).unix(),
@@ -51,13 +52,13 @@ class LogService extends Service {
 
   async metadatalog(action, data, conn) {
     const name = data.protocol;
-    const metadata = JSON.stringify(data.metadata);
-    const metadata_name = Util.get_metadata_value(data.metadata, 'name');
+    const metadata = Util.array_to_map(data.metadata || {});
+    const metadata_name = metadata.name;
     // update protocol
     const protocol = await conn.get('protocol', { name });
     await conn.update('protocol', {
       id: protocol.id,
-      metadata,
+      metadata: JSON.stringify(metadata),
       metadata_name,
     });
     await this.statuslog(action, data, conn);
@@ -65,8 +66,8 @@ class LogService extends Service {
 
   async contractslog(action, data, conn) {
     const name = data.protocol;
-    const contracts = JSON.stringify(data.contracts);
-    const evm = JSON.stringify(data.evm);
+    const contracts = JSON.stringify(data.contracts || []);
+    const evm = JSON.stringify(data.evm || []);
     // update protocol
     const protocol = await conn.get('protocol', { name });
     await conn.update('protocol', {
@@ -101,7 +102,7 @@ class LogService extends Service {
     const status = data.status;
     // update protocol
     const protocol = await conn.get('protocol', { name });
-    if(!status || protocol.status === status) return;
+    if (!status || protocol.status === status) return;
     await conn.update('protocol', {
       id: protocol.id,
       status,
@@ -267,11 +268,11 @@ class LogService extends Service {
    */
   async updatelog(conn, data, protocol, protocol_stat, protocol_category_stat, options) {
     const { period, table_prefix } = options;
-    
+
     const duration = DurationType[table_prefix];
     const now_line_id = Util.convert_now_line_id(table_prefix, period);
     // Obtain the data 24h/8h/10m ago for tvl_eos_change/tvl_usd_change
-    const last_period_line_id = period - duration - 600; 
+    const last_period_line_id = period - duration - 600;
     // table name
     const table_line_protocol = 'line_protocol_' + table_prefix;
     const table_line_protocol_stat = 'line_protocol_stat_' + table_prefix;
@@ -295,7 +296,9 @@ class LogService extends Service {
     // now tvl - latest tvl
     const tvl_eos_change = last_period_protocol ? Util.sub(tvl_eos, last_period_protocol.tvl_eos) : tvl_eos;
     const tvl_usd_change = last_period_protocol ? Util.sub(tvl_usd, last_period_protocol.tvl_usd) : tvl_usd;
-    const agg_rewards_change = last_period_protocol ? Util.sub(agg_rewards, last_period_protocol.agg_rewards) : agg_rewards;
+    const agg_rewards_change = last_period_protocol
+      ? Util.sub(agg_rewards, last_period_protocol.agg_rewards)
+      : agg_rewards;
 
     // update current protocol line
     const protolcol_row = {
@@ -326,7 +329,6 @@ class LogService extends Service {
     const stat_agg_rewards_change = last_period_protocol_stat
       ? Util.sub(stat_agg_rewards, last_period_protocol_stat.agg_rewards)
       : stat_agg_rewards;
-
 
     // update current stat line
     const protolcol_stat_row = {
@@ -360,7 +362,6 @@ class LogService extends Service {
     const category_stat_agg_rewards_change = last_period_protocol_category_stat
       ? Util.sub(category_stat_agg_rewards, last_period_protocol_category_stat.agg_rewards)
       : category_stat_agg_rewards;
-
 
     // update current category stat line
     const protolcol_category_stat_row = {

@@ -15,9 +15,10 @@ class NodeController extends BaseController {
   async list() {
     const { app } = this;
     const db = app.mysql.get('yield');
-    const data = await db.query('select * from chain_node where status = 1');
+    const data = await db.query('select chain, chain_id, url, area, is_default from chain_node where status = 1 order by sort');
     super.success(data);
   }
+
 }
 
 module.exports = NodeController;
