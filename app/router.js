@@ -13,10 +13,12 @@ module.exports = app => {
   router.get('/v1/protocols/categorystats/:category', controller.v1.protocols.protocol_category_stat_show);
   router.get('/v1/protocols/:name', controller.v1.protocols.protocol_show);
   
-  router.get('/v1/lines/:duration', controller.v1.lines.list);
-  router.get('/v1/lines/:duration/stats', controller.v1.lines.stat_list);
-  router.get('/v1/lines/:duration/categorystats', controller.v1.lines.category_stat_list);
+  router.get('/v1/lines/:line_type', controller.v1.lines.list);
+  router.get('/v1/lines/:line_type/stats', controller.v1.lines.stat_list);
+  router.get('/v1/lines/:line_type/categorystats', controller.v1.lines.category_stat_list);
 
-  router.get('/v1/echart/lines/:duration', controller.v1.echart.list);
-  router.get('/v1/echart/lines/:duration/categorystats', controller.v1.echart.category_stat_list);  
+  router.get('/v1/echart/lines/:line_type', controller.v1.echart.list);
+  router.get('/v1/echart/lines/:line_type/categorystats', controller.v1.echart.category_stat_list); 
+
+  router.post('/v1/ipfs/logo', controller.v1.ipfs.logo);  
 };

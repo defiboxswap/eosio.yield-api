@@ -12,6 +12,14 @@ module.exports = appInfo => {
    **/
   const config = (exports = {});
 
+  config.multipart = {
+    mode: 'file',
+    whitelist: [ '.png' ],
+    fileSize: '2mb',
+    fieldSize: '1024kb',
+    files: 1,
+  };
+
   // use for cookie sign key, should change to your own and keep security
   config.keys = appInfo.name + '_1653875977514_1416';
 
@@ -68,6 +76,7 @@ module.exports = appInfo => {
     updateAgeOnGet: false,
     updateAgeOnHas: false,
   };
+  config.pinata_url = 'https://api.pinata.cloud/pinning/pinFileToIPFS';
   return {
     ...config,
     ...userConfig,
