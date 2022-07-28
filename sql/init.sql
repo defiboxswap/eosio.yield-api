@@ -35,7 +35,6 @@ CREATE TABLE `line_protocol_10m`  (
   INDEX `idx_name`(`name`) USING BTREE
 ) ENGINE = InnoDB ROW_FORMAT = DYNAMIC;
 
-
 -- ----------------------------
 -- Table structure for line_protocol_stat_10m
 -- ----------------------------
@@ -177,6 +176,58 @@ CREATE TABLE `line_protocol_stat_day`  (
 ) ENGINE = InnoDB ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
+-- Table structure for line_protocol_category_stat_week
+-- ----------------------------
+DROP TABLE IF EXISTS `line_protocol_category_stat_week`;
+CREATE TABLE `line_protocol_category_stat_week`  (
+  `line_id` bigint(10) NOT NULL COMMENT 'primary key',
+  `category` varchar(13) NOT NULL COMMENT 'protocol category',
+  `tvl_eos` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl eos valuation',
+  `tvl_usd` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl usd valuation',
+  `tvl_eos_change` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl week change(eos)',
+  `tvl_usd_change` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl week change(usd)',
+  `agg_rewards` decimal(30, 10) NOT NULL DEFAULT 0.0000000000 COMMENT 'aggregate rewards',
+  `agg_rewards_change` decimal(30, 10) NOT NULL DEFAULT 0.0000000000 COMMENT 'aggregate rewards change',
+  `agg_protocol_count` int(10) NOT NULL DEFAULT 0 COMMENT 'aggregate protocol count',
+  PRIMARY KEY (`line_id`, `category`) USING BTREE,
+  INDEX `idx_category`(`category`) USING BTREE
+) ENGINE = InnoDB ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Table structure for line_protocol_week
+-- ----------------------------
+DROP TABLE IF EXISTS `line_protocol_week`;
+CREATE TABLE `line_protocol_week`  (
+  `line_id` bigint(10) NOT NULL COMMENT 'primary key',
+  `name` varchar(13) NOT NULL COMMENT 'protocol name',
+  `tvl_eos` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl eos valuation',
+  `tvl_usd` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl usd valuation',
+  `tvl_eos_change` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl week change(eos)',
+  `tvl_usd_change` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl week change(usd)',
+  `agg_rewards` decimal(30, 10) NOT NULL DEFAULT 0.0000000000 COMMENT 'aggregate rewards',
+  `agg_rewards_change` decimal(30, 10) NOT NULL DEFAULT 0.0000000000 COMMENT 'aggregate rewards change',
+  PRIMARY KEY (`line_id`, `name`) USING BTREE,
+  INDEX `idx_name`(`name`) USING BTREE
+) ENGINE = InnoDB ROW_FORMAT = DYNAMIC;
+
+
+-- ----------------------------
+-- Table structure for line_protocol_stat_week
+-- ----------------------------
+DROP TABLE IF EXISTS `line_protocol_stat_week`;
+CREATE TABLE `line_protocol_stat_week`  (
+  `line_id` bigint(10) NOT NULL AUTO_INCREMENT COMMENT 'primary key',
+  `tvl_eos` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl eos valuation',
+  `tvl_usd` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl usd valuation',
+  `tvl_eos_change` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl week change(eos)',
+  `tvl_usd_change` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl week change(usd)',
+  `agg_rewards` decimal(30, 10) NOT NULL DEFAULT 0.0000000000 COMMENT 'aggregate rewards',
+  `agg_rewards_change` decimal(30, 10) NOT NULL DEFAULT 0.0000000000 COMMENT 'aggregate rewards change',
+  `agg_protocol_count` int(10) NOT NULL DEFAULT 0 COMMENT 'aggregate protocol count',
+  PRIMARY KEY (`line_id`) USING BTREE
+) ENGINE = InnoDB ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
 -- Table structure for params
 -- ----------------------------
 DROP TABLE IF EXISTS `params`;
@@ -200,8 +251,12 @@ CREATE TABLE `protocol`  (
   `category` varchar(32) DEFAULT NULL COMMENT 'category',
   `tvl_eos` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl of eos valuation',
   `tvl_usd` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl of usd valuation',
-  `tvl_eos_change` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl 24h change(eos)',
-  `tvl_usd_change` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl 24h change(usd)',
+  `tvl_eos_change_day` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl 24h change(eos)',
+  `tvl_usd_change_day` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl 24h change(usd)',
+  `tvl_eos_change_8h` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl 8h change(eos)',
+  `tvl_usd_change_8h` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl 8h change(usd)',
+  `tvl_eos_change_week` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl week change(eos)',
+  `tvl_usd_change_week` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl week change(usd)',
   `agg_rewards` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'aggregate rewards',
   `agg_rewards_change` decimal(30, 10) NOT NULL DEFAULT 0.0000000000 COMMENT 'aggregate rewards change',
   `balance` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'balance available to be claimed',
@@ -226,8 +281,12 @@ CREATE TABLE `protocol_category_stat`  (
   `category` varchar(13) NOT NULL COMMENT 'protocol category',
   `tvl_eos` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl eos valuation',
   `tvl_usd` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl usd valuation',
-  `tvl_eos_change` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl 24h change(eos)',
-  `tvl_usd_change` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl 24h change(usd)',
+  `tvl_eos_change_day` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl 24h change(eos)',
+  `tvl_usd_change_day` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl 24h change(usd)',
+  `tvl_eos_change_8h` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl 8h change(eos)',
+  `tvl_usd_change_8h` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl 8h change(usd)',
+  `tvl_eos_change_week` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl week change(eos)',
+  `tvl_usd_change_week` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl week change(usd)',
   `agg_rewards` decimal(30, 10) NOT NULL DEFAULT 0.0000000000 COMMENT 'aggregate rewards',
   `agg_rewards_change` decimal(30, 10) NOT NULL DEFAULT 0.0000000000 COMMENT 'aggregate rewards change',
   `agg_protocol_count` int(10) NOT NULL DEFAULT 0 COMMENT 'aggregate protocol count',
@@ -245,8 +304,12 @@ CREATE TABLE `protocol_stat`  (
   `id` bigint(10) NOT NULL AUTO_INCREMENT COMMENT 'primary key',
   `tvl_eos` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl eos valuation',
   `tvl_usd` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl usd valuation',
-  `tvl_eos_change` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl 24h change(eos)',
-  `tvl_usd_change` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl 24h change(usd)',
+  `tvl_eos_change_day` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl 24h change(eos)',
+  `tvl_usd_change_day` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl 24h change(usd)',
+  `tvl_eos_change_8h` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl 8h change(eos)',
+  `tvl_usd_change_8h` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl 8h change(usd)',
+  `tvl_eos_change_week` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl week change(eos)',
+  `tvl_usd_change_week` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'tvl week change(usd)',
   `agg_rewards` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'aggregate rewards',
   `agg_rewards_change` decimal(30, 10) NOT NULL DEFAULT 0.0000000000 COMMENT 'aggregate rewards change',
   `agg_protocol_count` int(10) NOT NULL DEFAULT '0' COMMENT 'aggregate protocol count',

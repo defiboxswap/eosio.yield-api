@@ -11,5 +11,19 @@ class BaseController extends Controller {
       [dataKey]: data,
     };
   }
+  error(code, message) {
+    if (typeof code === 'object') {
+      const msgInfo = code;
+      code = msgInfo.errorCode;
+      message = msgInfo.message;
+    } else {
+      code = code || 500;
+      message = message || 'error';
+    }
+    this.ctx.body = {
+      code,
+      message,
+    };
+  }
 }
 module.exports = BaseController;
