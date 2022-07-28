@@ -1,7 +1,7 @@
 {
-  "name": "eosyield-api",
+  "name": "eosioyield-api",
   "version": "1.0.0",
-  "description": "EOS Yield+ history processing logic and api",
+  "description": "EOS Yield+ history log processing and provide interface.",
   "private": true,
   "egg": {
     "declarations": true
@@ -31,11 +31,11 @@
     "node": ">=10.0.0"
   },
   "scripts": {
-    "start": "egg-scripts start --daemon --title=eosyield-api --port 5051",
-    "start-test": "egg-scripts start --env=test --workers=2 --daemon --title=eosyield-api --port 5051",
-    "stop": "egg-scripts stop --title=eosyield-api",
-    "dev": "egg-bin dev --port 5051",
-    "debug": "egg-bin debug --port 5051",
+    "start": "egg-scripts start --daemon",
+    "start-test": "egg-scripts start --env=test --workers=2 --daemon",
+    "stop": "egg-scripts stop",
+    "dev": "egg-bin dev",
+    "debug": "egg-bin debug",
     "test": "npm run lint -- --fix && npm run test-local",
     "test-local": "egg-bin test",
     "cov": "egg-bin cov",
@@ -50,6 +50,6 @@
     "type": "git",
     "url": ""
   },
-  "author": "eosyield",
+  "author": "defibox",
   "license": "MIT"
 }
