@@ -1,6 +1,6 @@
 'use strict';
 const LRU = require('lru-cache')
-const { sleep } = require('./app/lib/utils/util');
+const { sleep } = require('./app/lib/util');
 
 
 class AppBootHook {

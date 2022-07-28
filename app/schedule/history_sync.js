@@ -4,7 +4,7 @@ const Subscription = require('egg').Subscription;
 const process_status = require('../lib/enums/process_status');
 const params_keys = require('../lib/enums/params_keys');
 const sync_status = require('../lib/enums/sync_status');
-const { camelProp, sleep } = require('../lib/utils/util');
+const { camelProp, sleep } = require('../lib/util');
 
 let local_status = sync_status.start;
 
@@ -22,7 +22,7 @@ class history_sync extends Subscription {
     const yield_db = ctx.app.mysql.get('yield');
     const history_db = ctx.app.mysql.get('history');
     if (app.globalStatus === 0 || local_status !== sync_status.start) return;
-    
+
     try {
       local_status = sync_status.processing;
       const param = await yield_db.get('params', { key: params_keys.history_sync_status });
@@ -42,14 +42,13 @@ class history_sync extends Subscription {
             status: process_status.being_processed,
           });
         }
-
+        const act_ids = event.act_ids.split(',');
+        // get actions
+        const actions = await history_db.query(
+          'select id, account, name, timestamp, data from dex_actions where id in (?)',
+          [act_ids]
+        );
         await yield_db.beginTransactionScope(async conn => {
-          const act_ids = event.act_ids.split(',');
-          // get actions
-          const actions = await history_db.query(
-            'select id, account, name, timestamp, data from dex_actions where id in (?)',
-            [act_ids]
-          );
           for (const action of actions) {
             const account = action.account;
             const name = action.name;

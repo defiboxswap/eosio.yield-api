@@ -1,7 +1,7 @@
 'use strict';
 const Decimal = require('decimal.js');
 const moment = require('moment');
-const DurationType = require('../enums/duration_type');
+const DurationType = require('./enums/duration_type');
 
 // [
 //   ['product', '2012', '2013', '2014', '2015', '2016', '2017'],
@@ -82,19 +82,14 @@ exports.convert_last_line_id = (type, date = undefined) => {
   if (date) {
     date *= 1000;
   }
-  if (type === 'day') {
-    return moment(date).startOf('day').unix() - DurationType[type];
-  } else if (type === '8h') {
-    const now = moment(date);
-    const startOfDay = moment(date).startOf('day');
-    const hour = Math.floor(now.diff(startOfDay, 'hour', true) / 8) * 8;
-    return startOfDay.hours(hour).unix() - DurationType[type];
-  } else if (type === '10m') {
-    const now = moment(date);
-    const startOfHour = moment(date).startOf('hours');
-    const minutes = Math.floor(now.diff(startOfHour, 'minutes', true) / 10) * 10;
-    return startOfHour.minutes(minutes).unix() - DurationType[type];
-  }
+  const { startUnitOfTime, diffUnitOfTime, unit, duration } = DurationType[type];
+
+  if (!diffUnitOfTime) return moment(date).utc().startOf(startUnitOfTime).unix() - duration;
+
+  const now = moment(date);
+  const startOf = moment(date).startOf(startUnitOfTime);
+  const diff = Math.floor(now.diff(startOf, diffUnitOfTime, true) / unit) * unit;
+  return startOf[diffUnitOfTime](diff).unix() - duration;
 };
 
 /**
@@ -112,19 +107,14 @@ exports.convert_now_line_id = (type, date = undefined) => {
   if (date) {
     date *= 1000;
   }
-  if (type === 'day') {
-    return moment(date).startOf('day').unix();
-  } else if (type === '8h') {
-    const now = moment(date);
-    const startOfDay = moment(date).startOf('day');
-    const hour = Math.floor(now.diff(startOfDay, 'hour', true) / 8) * 8;
-    return startOfDay.hours(hour).unix();
-  } else if (type === '10m') {
-    const now = moment(date);
-    const startOfHour = moment(date).startOf('hours');
-    const minutes = Math.floor(now.diff(startOfHour, 'minutes', true) / 10) * 10;
-    return startOfHour.minutes(minutes).unix();
-  }
+  const { startUnitOfTime, diffUnitOfTime, unit } = DurationType[type];
+
+  if (!diffUnitOfTime) return moment(date).utc().startOf(startUnitOfTime).unix();
+
+  const now = moment(date);
+  const startOf = moment(date).startOf(startUnitOfTime);
+  const diff = Math.floor(now.diff(startOf, diffUnitOfTime, true) / unit) * unit;
+  return startOf[diffUnitOfTime](diff).unix();
 };
 
 /**
@@ -153,7 +143,7 @@ exports.get_metadata_value = (metadata, key) => {
  * convert array to map
  * @param {array} arr
  */
-exports.array_to_map = arr => {
+exports.array_to_object = arr => {
   const result = {};
   if (arr) {
     for (const item of arr) {
