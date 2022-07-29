@@ -182,7 +182,7 @@ class ProtocolsController extends BaseController {
       strokeOpacity: 1,
       stroke,
     });
-    ctx.body = svg;
+    ctx.body = Constants.svg_header + svg;
   }
 }
 
