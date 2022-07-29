@@ -2,6 +2,7 @@
 const BaseController = require('../base_controller');
 const moment = require('moment');
 const sparkline = require('node-sparkline');
+const Constants = require('../../lib/constants');
 
 /**
  * @Controller protocols
@@ -148,7 +149,7 @@ class ProtocolsController extends BaseController {
    * @Router get /v1/protocols/{name}/sparkline
    * @Request query string *tvl_type enum:tvl_usd,tvl_eos
    * @Request path string *name protocol name
-   * @response 200 sparkline_result resp
+   * @response 200  resp
    **/
   async sparkline() {
     const { app, ctx } = this;
@@ -162,12 +163,17 @@ class ProtocolsController extends BaseController {
     };
     ctx.validate(rules, params);
     const db = app.mysql.get('yield');
-    const values = (await db.query(`select ${params.tvl_type} as tvl from line_protocol_10m where name =? and line_id >= ? and line_id % 3600 = 0 `, [
-      params.name,
-      moment().subtract(7, 'd').unix(),
-    ])).map(({tvl}) => tvl);
-    //  Green/Red (positive/negative) TVL from first data entry
-    const stroke = values.length > 1 && values[values.length - 1] > values[values.length - 2]? "#57bd0f": "#ed5565";
+    const values = (
+      await db.query(
+        `select ${params.tvl_type} as tvl from line_protocol_10m where name =? and line_id >= ? and line_id % 3600 = 0 `,
+        [params.name, moment().subtract(7, 'd').unix()]
+      )
+    ).map(({ tvl }) => tvl);
+    // Green/Red (positive/negative) TVL from first data entry
+    const stroke =
+      values.length > 1 && values[values.length - 1] > values[values.length - 2]
+        ? Constants.stroke_green
+        : Constants.stroke_red;
     const svg = sparkline({
       values,
       width: 135,
