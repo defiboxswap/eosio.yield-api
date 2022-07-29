@@ -1,11 +1,12 @@
 'use strict';
 const BaseController = require('../base_controller');
+const moment = require('moment');
+const sparkline = require('node-sparkline');
+
 /**
  * @Controller protocols
  */
 class ProtocolsController extends BaseController {
-
-  
   /**
    * @Summary Get protocols
    * @Router get /v1/protocols
@@ -25,8 +26,13 @@ class ProtocolsController extends BaseController {
       pageSize: { type: 'number', required: false },
       search: { type: 'string', trim: true, required: false },
       category: { type: 'string', trim: true, required: false },
-      status: { type: 'string', trim: true, required: false, values: [ 'pending', 'active', 'denied' ] },
-      order: { type: 'enum', trim: true, required: false, values: [ 'tvl_usd', 'tvl_usd_change', 'agg_rewards', 'create_at' ] },
+      status: { type: 'string', trim: true, required: false, values: ['pending', 'active', 'denied'] },
+      order: {
+        type: 'enum',
+        trim: true,
+        required: false,
+        values: ['tvl_usd', 'tvl_usd_change', 'agg_rewards', 'create_at'],
+      },
     };
     const params = {
       pageNo: ctx.request.query.pageNo ? parseInt(ctx.request.query.pageNo) : 1,
@@ -47,20 +53,18 @@ class ProtocolsController extends BaseController {
     }
     if (params.category) {
       sql += ' and category = :category ';
-    } 
+    }
     if (params.status) {
       sql += ' and status = :status ';
     }
     sql += ` order by ${params.order} desc limit :offset, :limit `;
-    const data = await db.query(sql,
-      {
-        search: '%' + params.search + '%',
-        status: params.status,
-        category: params.category,
-        offset: (params.pageNo - 1) * params.pageSize,
-        limit: params.pageSize,
-      }
-    );
+    const data = await db.query(sql, {
+      search: '%' + params.search + '%',
+      status: params.status,
+      category: params.category,
+      offset: (params.pageNo - 1) * params.pageSize,
+      limit: params.pageSize,
+    });
 
     super.success(data);
   }
@@ -70,7 +74,7 @@ class ProtocolsController extends BaseController {
    * @Router get /v1/protocols/{name}
    * @Request path string *name protocol name
    * @response 200 protocol resp
-  **/
+   **/
   async protocol_show() {
     const { app, ctx } = this;
     const db = app.mysql.get('yield');
@@ -84,18 +88,20 @@ class ProtocolsController extends BaseController {
 
     const data = await db.get('protocol', { name: params.name });
     if (data) {
-      const rankResult = await db.queryOne('select count(*) + 1 rank from protocol where is_delete = 0 and tvl_eos > ?', 
-      [ data.tvl_eos]);
+      const rankResult = await db.queryOne(
+        'select count(*) + 1 rank from protocol where is_delete = 0 and tvl_eos > ?',
+        [data.tvl_eos]
+      );
       data.rank = rankResult.rank;
     }
     super.success(data);
   }
 
   /**
-     * @Summary Get current protocol category stats.
-     * @Router get /v1/protocols/categorystats
-     * @response 200 protocolt_category_stat resp
-    **/
+   * @Summary Get current protocol category stats.
+   * @Router get /v1/protocols/categorystats
+   * @response 200 protocolt_category_stat resp
+   **/
   async protocol_category_stat_list() {
     const { app } = this;
     const db = app.mysql.get('yield');
@@ -104,11 +110,11 @@ class ProtocolsController extends BaseController {
   }
 
   /**
-     * @Summary Get protocol category stat detail.
-     * @Router get /v1/protocols/categorystats/{category}
-     * @Request path string *category protocol category
-     * @response 200 protocolt_category_stat resp
-    **/
+   * @Summary Get protocol category stat detail.
+   * @Router get /v1/protocols/categorystats/{category}
+   * @Request path string *category protocol category
+   * @response 200 protocolt_category_stat resp
+   **/
   async protocol_category_stat_show() {
     const { app, ctx } = this;
     const db = app.mysql.get('yield');
@@ -125,12 +131,11 @@ class ProtocolsController extends BaseController {
     super.success(data);
   }
 
-
   /**
- * @Summary Get current protocol stat.
- * @Router get /v1/protocols/stat
- * @response 200 protocol_stat resp
-**/
+   * @Summary Get current protocol stat.
+   * @Router get /v1/protocols/stat
+   * @response 200 protocol_stat resp
+   **/
   async protocol_stat_show() {
     const { app } = this;
     const db = app.mysql.get('yield');
@@ -138,6 +143,41 @@ class ProtocolsController extends BaseController {
     super.success(data);
   }
 
+  /**
+   * @Summary sparkline.
+   * @Router get /v1/protocols/{name}/sparkline
+   * @Request query string *tvl_type enum:tvl_usd,tvl_eos
+   * @Request path string *name protocol name
+   * @response 200 sparkline_result resp
+   **/
+  async sparkline() {
+    const { app, ctx } = this;
+    const rules = {
+      tvl_type: { type: 'enum', trim: true, required: true, values: ['tvl_usd', 'tvl_eos'] },
+      name: { type: 'string', required: true },
+    };
+    const params = {
+      tvl_type: ctx.request.query.tvl_type,
+      name: ctx.params.name,
+    };
+    ctx.validate(rules, params);
+    const db = app.mysql.get('yield');
+    const values = (await db.query(`select ${params.tvl_type} as tvl from line_protocol_10m where name =? and line_id >= ? and line_id % 3600 = 0 `, [
+      params.name,
+      moment().subtract(7, 'd').unix(),
+    ])).map(({tvl}) => tvl);
+    //  Green/Red (positive/negative) TVL from first data entry
+    const stroke = values.length > 1 && values[values.length - 1] > values[values.length - 2]? "#57bd0f": "#ed5565";
+    const svg = sparkline({
+      values,
+      width: 135,
+      height: 50,
+      strokeWidth: 1,
+      strokeOpacity: 1,
+      stroke,
+    });
+    ctx.body = svg;
+  }
 }
 
 module.exports = ProtocolsController;

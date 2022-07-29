@@ -11,6 +11,7 @@ module.exports = app => {
   router.get('/v1/protocols/stat', controller.v1.protocols.protocol_stat_show);
   router.get('/v1/protocols/categorystats', controller.v1.protocols.protocol_category_stat_list);
   router.get('/v1/protocols/categorystats/:category', controller.v1.protocols.protocol_category_stat_show);
+  router.get('/v1/protocols/:name/sparkline', controller.v1.protocols.sparkline);  
   router.get('/v1/protocols/:name', controller.v1.protocols.protocol_show);
   
   router.get('/v1/lines/:line_type', controller.v1.lines.list);
