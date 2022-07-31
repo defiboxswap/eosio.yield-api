@@ -55,8 +55,6 @@ module.exports = {
     app: true,
     // Whether to load the file to the Agent. The default value is disabled
     agent: false,
-    pinata_api_key: '',
-    pinata_secret_api_key: '',
   },
   pinata_api_key: "",
   pinata_secret_api_key: "",
