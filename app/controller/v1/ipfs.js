@@ -10,6 +10,7 @@ class IpfsController extends BaseController {
   /**
    * @Summary Upload logo.
    * @Router post /v1/ipfs/logo
+   * @consume multipart/form-data
    * @Request formData file *file logo file
    * @response 200 ipfs_result resp
    **/
@@ -24,8 +25,8 @@ class IpfsController extends BaseController {
     // validate
     ctx.validate(rules, params);
     let result;
+    const file = params.file[0];
     try {
-      const file = params.file[0];
       result = await ctx.curl(app.config.pinata_url, {
         method: 'POST',
         dataType: 'json',
@@ -51,6 +52,9 @@ class IpfsController extends BaseController {
       }
     } catch (e) {
       super.error(ErrorCode.timeout.code, ErrorCode.timeout.msg);
+    } finally {
+      // Delete temporary files
+      fs.unlink(file.filepath, ()=>{});
     }
   }
 }
