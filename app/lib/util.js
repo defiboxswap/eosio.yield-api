@@ -163,7 +163,7 @@ exports.array_to_object = arr => {
  */
 exports.sparkline = ({ values, width = 135, height = 50, strokeWidth = 1, strokeOpacity = 1 }) => {
   const stroke =
-    values.length > 1 && values[values.length - 1] > values[values.length - 2]
+    values.length > 1 && values[values.length - 1] > values[0]
       ? Constants.stroke_green
       : Constants.stroke_red;
   return Constants.svg_header + sparkline({ values, width, height, strokeWidth, strokeOpacity, stroke });

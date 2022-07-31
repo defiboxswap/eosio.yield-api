@@ -1,7 +1,7 @@
 'use strict';
 
 const Service = require('egg').Service;
-const { convert_now_line_id } = require('../lib/util');
+const { convert_now_line_id, sparkline } = require('../lib/util');
 const DurationType = require('../lib/enums/duration_type');
 
 /**
@@ -131,13 +131,31 @@ class LineService extends Service {
     return result;
   }
 
-  
+  /**
+   * @param  name protocol name
+   * @param  tvl_type tvl type enum:tvl_eos,tvl_usd
+   **/
+  async sparkline(params) {
+    const { app } = this;
+    const db = app.mysql.get('yield');
+    const from = convert_now_line_id('10m') - 7*86400;
+    let values = (
+      await db.query(
+        `select ${params.tvl_type} as tvl from line_protocol_10m where name =? 
+         and line_id >= ? and (line_id - ?) % 3600 = 0 `,
+        [params.name, from, from]
+      )
+    ).map(({ tvl }) => tvl);
+    
+    return sparkline({values});
+  }
+
   getFrom(ctx, line_type, duration) {
     const rules = {
       duration: { type: 'number', required: true, max: DurationType[line_type].max_line_search_day },
     };
     const params = {
-      duration: duration? duration : DurationType[line_type].max_line_search_day,
+      duration: duration ? duration : DurationType[line_type].max_line_search_day,
     };
     ctx.validate(rules, params);
     return convert_now_line_id(line_type) - (params.duration - 1) * 86400;
