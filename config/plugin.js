@@ -23,6 +23,6 @@ module.exports = {
 
   swaggerdoc: {
     enable: true,
-    package: 'egg-swagger-doc',
+    package: 'egg-swagger-doc-x',
   },
 };

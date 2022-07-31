@@ -2,6 +2,8 @@
 const Decimal = require('decimal.js');
 const moment = require('moment');
 const DurationType = require('./enums/duration_type');
+const Constants = require('../lib/constants');
+const sparkline = require('node-sparkline');
 
 // [
 //   ['product', '2012', '2013', '2014', '2015', '2016', '2017'],
@@ -151,4 +153,18 @@ exports.array_to_object = arr => {
     }
   }
   return result;
+};
+
+/**
+ * sparkline generator
+ * Green/Red (positive/negative) TVL from first data entry
+ * @param {object} options
+ * @returns
+ */
+exports.sparkline = ({ values, width = 135, height = 50, strokeWidth = 1, strokeOpacity = 1 }) => {
+  const stroke =
+    values.length > 1 && values[values.length - 1] > values[values.length - 2]
+      ? Constants.stroke_green
+      : Constants.stroke_red;
+  return Constants.svg_header + sparkline({ values, width, height, strokeWidth, strokeOpacity, stroke });
 };
