@@ -54,13 +54,22 @@ class EosioYieldService extends Service {
     const name = data.protocol;
     const metadata = Util.array_to_object(data.metadata || {});
     const metadata_name = metadata.name;
+    const category = data.category;
     // update protocol
     const protocol = await conn.get('protocol', { name });
     await conn.update('protocol', {
       id: protocol.id,
+      category,
       metadata: JSON.stringify(metadata),
       metadata_name,
     });
+    if (protocol.category !== category && protocol.status === ProtocolStatus.active) {
+      // update original category stat
+      await this.updateStatusOrCategoryForProtocolCategoryStat(conn, protocol, protocol.category, false);
+
+      // update new category stat
+      await this.updateStatusOrCategoryForProtocolCategoryStat(conn, protocol, category, true);
+    }
     await this.statuslog(action, data, conn);
   }
 
@@ -75,25 +84,6 @@ class EosioYieldService extends Service {
       contracts,
       evm,
     });
-    await this.statuslog(action, data, conn);
-  }
-
-  async categorylog(action, data, conn) {
-    const name = data.protocol;
-    const category = data.category;
-    const protocol = await conn.get('protocol', { name });
-    // update protocol
-    await conn.update('protocol', {
-      id: protocol.id,
-      category,
-    });
-    if (protocol.category !== category && protocol.status === ProtocolStatus.active) {
-      // update original category stat
-      await this.updateStatusOrCategoryForProtocolCategoryStat(conn, protocol, protocol.category, false);
-
-      // update new category stat
-      await this.updateStatusOrCategoryForProtocolCategoryStat(conn, protocol, category, true);
-    }
     await this.statuslog(action, data, conn);
   }
 
