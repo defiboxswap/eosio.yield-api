@@ -13,23 +13,30 @@ class ProtocolsController extends BaseController {
    * @Request query string search fuzzy search metadata name
    * @Request query string category protocol category
    * @Request query string status enum:pending,active,denied
-   * @Request query string order enum:tvl_usd,tvl_usd_change,agg_rewards,create_at
+   * @Request query string order_cloumn enum:tvl_usd,tvl_usd_change_8h,tvl_usd_change_day,tvl_usd_change_week,agg_rewards,create_at
+   * @Request query string order_type enum:asc,desc
    * @response 200 protocol resp
    */
   async protocol_page() {
     const { app, ctx } = this;
     const db = app.mysql.get('yield');
     const rules = {
-      pageNo: { type: 'number', required: false },
-      pageSize: { type: 'number', required: false },
+      pageNo: { type: 'number', required: false, min:1 },
+      pageSize: { type: 'number', required: false, max: 300 },
       search: { type: 'string', trim: true, required: false },
       category: { type: 'string', trim: true, required: false },
       status: { type: 'enum', trim: true, required: false, values: ['pending', 'active', 'denied'] },
-      order: {
+      order_column: {
         type: 'enum',
         trim: true,
         required: false,
-        values: ['tvl_usd', 'tvl_usd_change', 'agg_rewards', 'create_at'],
+        values: ['tvl_usd', 'tvl_usd_change_8h', 'tvl_usd_change_day', 'tvl_usd_change_week', 'agg_rewards', 'create_at'],
+      },
+      order_type: {
+        type: 'enum',
+        trim: true,
+        required: false,
+        values: ['asc', 'desc'],
       },
     };
     const params = {
@@ -38,12 +45,11 @@ class ProtocolsController extends BaseController {
       search: ctx.request.query.search,
       category: ctx.request.query.category,
       status: ctx.request.query.status,
-      order: ctx.request.query.order || 'tvl_usd',
+      order_column: ctx.request.query.order_column || 'tvl_usd',
+      order_type: ctx.request.query.order_type || 'desc',
     };
     // validate
     ctx.validate(rules, params);
-    // Limit the maximum number of rows
-    if (params.pageSize > 300) params.pageSize = 300;
 
     let sql = 'select * from protocol where is_delete = 0 ';
     if (params.search) {
@@ -55,7 +61,7 @@ class ProtocolsController extends BaseController {
     if (params.status) {
       sql += ' and status = :status ';
     }
-    sql += ` order by ${params.order} desc limit :offset, :limit `;
+    sql += ` order by ${params.order_column} ${params.order_type} limit :offset, :limit `;
     const data = await db.query(sql, {
       search: '%' + params.search + '%',
       status: params.status,
