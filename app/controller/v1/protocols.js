@@ -13,7 +13,7 @@ class ProtocolsController extends BaseController {
    * @Request query string search fuzzy search metadata name
    * @Request query string category protocol category
    * @Request query string status enum:pending,active,denied
-   * @Request query string order_cloumn enum:tvl_usd,tvl_usd_change_8h,tvl_usd_change_day,tvl_usd_change_week,agg_rewards,create_at
+   * @Request query string order_cloumn enum:tvl_usd,tvl_usd_change_8h,tvl_usd_change_day,tvl_usd_change_week,tvl_eos,tvl_eos_change_8h,tvl_eos_change_day,tvl_eos_change_week,agg_rewards,create_at
    * @Request query string order_type enum:asc,desc
    * @response 200 protocol resp
    */
@@ -30,7 +30,7 @@ class ProtocolsController extends BaseController {
         type: 'enum',
         trim: true,
         required: false,
-        values: ['tvl_usd', 'tvl_usd_change_8h', 'tvl_usd_change_day', 'tvl_usd_change_week', 'agg_rewards', 'create_at'],
+        values: ['tvl_usd', 'tvl_usd_change_8h', 'tvl_usd_change_day', 'tvl_usd_change_week', 'tvl_eos', 'tvl_eos_change_8h', 'tvl_eos_change_day', 'tvl_eos_change_week','agg_rewards', 'create_at'],
       },
       order_type: {
         type: 'enum',
