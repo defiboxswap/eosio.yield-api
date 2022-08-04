@@ -20,8 +20,10 @@ module.exports = {
     metadata: { type: 'string', description: 'The protocol metadata', example: {"name":"Danchor","url":"https://defibox.io/usn"}},
     balance: { type: 'number', description: 'The balance rewards', example: 23041.9849},
     claimed: { type: 'number', description: 'The claimed rewards', example: 0},
+    rewards: { type: 'number', description: 'The reward', example: 3.1201000000},
     status: { type: 'string', description: 'The protocol status: pending,active,denied', example: 'active'},
     period: { type: 'number', description: 'The period time', example: 1658190600},
+    rewards_period: { type: 'number', description: 'The rewards period time', example: 1658190600},
     is_delete: { type: 'number', description: 'The delete status (1: deleted 0: not deleted)', example: 0},
     create_at: { type: 'number', description: 'The protocol create timestamp', example: 1655472145},
   },
@@ -40,6 +42,7 @@ module.exports = {
     agg_protocol_count: { type: 'number', description: 'The aggregate protocol count', example: 6},
     claimed: { type: 'number', description: 'The claimed rewards', example: 0},
     period: { type: 'number', description: 'The period time', example: 1658190600},
+    rewards_period: { type: 'number', description: 'The rewards period time', example: 1658190600},
   },
   protocolt_category_stat: {
     id: { type: 'number', description: 'The row id', example: 1 },
@@ -57,6 +60,7 @@ module.exports = {
     agg_protocol_count: { type: 'number', description: 'The aggregate protocol count', example: 6},
     claimed: { type: 'number', description: 'The claimed rewards', example: 0},
     period: { type: 'number', description: 'The period time', example: 1658190600},
+    rewards_period: { type: 'number', description: 'The rewards period time', example: 1658190600},
   },
   line: {
     line_id: { type: 'number', description: 'The timestamp', example: 1656288000},

@@ -228,19 +228,6 @@ CREATE TABLE `line_protocol_stat_week`  (
 ) ENGINE = InnoDB ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
--- Table structure for params
--- ----------------------------
-DROP TABLE IF EXISTS `params`;
-CREATE TABLE `params`  (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
-  `key` varchar(128)  NOT NULL DEFAULT '' COMMENT 'key',
-  `value` varchar(128)  NULL DEFAULT NULL COMMENT 'value',
-  `remark` varchar(1024)  NULL DEFAULT NULL COMMENT 'remark',
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `idx_key`(`key`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 ROW_FORMAT = DYNAMIC;
-
--- ----------------------------
 -- Table structure for protocol
 -- ----------------------------
 DROP TABLE IF EXISTS `protocol`;
@@ -261,7 +248,9 @@ CREATE TABLE `protocol`  (
   `agg_rewards_change` decimal(30, 10) NOT NULL DEFAULT 0.0000000000 COMMENT 'aggregate rewards change',
   `balance` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'balance available to be claimed',
   `claimed` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'claimed rewards',
-  `period` int(11) DEFAULT '0' COMMENT 'report period',
+  `rewards` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'The reward',
+  `period` int(11) DEFAULT '0' COMMENT 'update period',
+  `rewards_period` int(11) DEFAULT '0' COMMENT 'rewards period',
   `create_at` int(10) NULL DEFAULT NULL,
   `metadata` json COMMENT 'metadata',
   `contracts` json DEFAULT NULL COMMENT 'additional supporting EOS contracts',
@@ -292,6 +281,7 @@ CREATE TABLE `protocol_category_stat`  (
   `agg_protocol_count` int(10) NOT NULL DEFAULT 0 COMMENT 'aggregate protocol count',
   `claimed` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'claimed rewards',
   `period` int(11) DEFAULT '0' COMMENT 'report period',
+  `rewards_period` int(11) DEFAULT '0' COMMENT 'rewards period',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_category`(`category`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 ROW_FORMAT = DYNAMIC;
@@ -315,6 +305,7 @@ CREATE TABLE `protocol_stat`  (
   `agg_protocol_count` int(10) NOT NULL DEFAULT '0' COMMENT 'aggregate protocol count',
   `claimed` decimal(30,10) NOT NULL DEFAULT 0.0000000000 COMMENT 'claimed rewards',
   `period` int(11) DEFAULT '0' COMMENT 'report period',
+  `rewards_period` int(11) DEFAULT '0' COMMENT 'rewards period',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 ROW_FORMAT = DYNAMIC;
 
@@ -337,6 +328,20 @@ CREATE TABLE `chain_node`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_chain`(`chain`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Table structure for params
+-- ----------------------------
+DROP TABLE IF EXISTS `params`;
+CREATE TABLE `params`  (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `key` varchar(128)  NOT NULL DEFAULT '' COMMENT 'key',
+  `value` varchar(128)  NULL DEFAULT NULL COMMENT 'value',
+  `remark` varchar(1024)  NULL DEFAULT NULL COMMENT 'remark',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_key`(`key`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 ROW_FORMAT = DYNAMIC;
+
 
 SET FOREIGN_KEY_CHECKS = 1;
 
