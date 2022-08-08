@@ -4,7 +4,6 @@ const Service = require('egg').Service;
 const moment = require('moment');
 const Util = require('../lib/util');
 const ProtocolStatus = require('../lib/enums/protocol_status');
-const DurationType = require('../lib/enums/duration_type');
 const Constants = require('../lib/constants');
 /**
  * eosio_yield log service
@@ -179,172 +178,59 @@ class EosioYieldService extends Service {
     const balance = parseFloat(data.balance);
     const rewards = parseFloat(data.rewards);
     const period = moment(data.period + '+00:00').unix();
-
+    if(rewards === 0) return;
     //irreversible handle
     let rewards_change = rewards;
     if (period.rewards_period === period) {
+      const protocol = await conn.queryOne('select rewards from protocol where name = ?', [name]);
       rewards_change = Util.sub(protocol.rewards, rewards);
       if (rewards_change === 0) return;
     }
 
-    // get protocol
-    const protocol = await conn.get('protocol', { name });
-    // get protocol stat
-    const protocol_stat = await conn.get('protocol_stat');
-    // get protocol category stat
-    const protocol_category_stat = await conn.get('protocol_category_stat', { category });
+    // update protocol
+    await conn.query(
+      'update protocol set balance=?,rewards=?,rewards_period = ?,agg_rewards=agg_rewards + ?,agg_rewards_change=agg_rewards_change + ? where name = ?',
+      [balance, rewards, period, rewards_change, rewards_change, name]
+    );
+    // update protocol gategory stat
+    await conn.query(
+      'update protocol_category_stat set rewards_period = ?,agg_rewards=agg_rewards + ?,agg_rewards_change=agg_rewards_change + ? where category=?',
+      [period, rewards_change, rewards_change, category]
+    );
+    // update protocol stat
+    await conn.query(
+      'update protocol_stat set rewards_period = ?,agg_rewards=agg_rewards + ?,agg_rewards_change=agg_rewards_change + ?',
+      [period, rewards_change, rewards_change]
+    );
 
-    const { last_period_line_ids, last_period_line_map } = await this.batchGetLastLines(conn, period, name, category);
+    for (const line_type of Constants.all_durations) {
+      // table name
+      const table_line_protocol = 'line_protocol_' + line_type;
+      const table_line_protocol_stat = 'line_protocol_stat_' + line_type;
+      const table_line_protocol_category_stat = 'line_protocol_category_stat_' + line_type;
 
-    for (const line_id of last_period_line_ids) {
-      const { line_type, last_period_protocol, last_period_protocol_stat, last_period_protocol_category_stat } =
-        last_period_line_map[line_id];
+      const line_id = Util.convert_last_line_id(line_type, period);
+      // update line_protocol_stat
+      await conn.query(
+        `update ${table_line_protocol} set agg_rewards=agg_rewards+?,agg_rewards_change=agg_rewards_change+? where line_id=? and name = ?`,
+        [rewards_change, rewards_change, line_id, name]
+      );
 
-      const agg_rewards = Util.add(protocol.agg_rewards, rewards_change);
-      const agg_rewards_change = last_period_protocol
-        ? Util.sub(agg_rewards, last_period_protocol.agg_rewards)
-        : agg_rewards;
+      // update line_protocol_stat
+      await conn.query(
+        `update ${table_line_protocol_stat} set agg_rewards=agg_rewards+?,agg_rewards_change=agg_rewards_change+? where line_id=?`,
+        [rewards_change, rewards_change, line_id]
+      );
 
-      const stat_agg_rewards = Util.add(protocol_stat.agg_rewards, rewards_change);
-
-      const stat_agg_rewards_change = last_period_protocol_stat
-        ? Util.sub(stat_agg_rewards, last_period_protocol_stat.agg_rewards)
-        : stat_agg_rewards;
-      const category_stat_agg_rewards = Util.add(protocol_category_stat.agg_rewards, rewards_change);
-      const category_stat_agg_rewards_change = last_period_protocol_category_stat
-        ? Util.sub(category_stat_agg_rewards, last_period_protocol_category_stat.agg_rewards)
-        : category_stat_agg_rewards;
-
-      if (line_type === 'day') {
-        // update protocol
-        await conn.update('protocol', {
-          id: protocol.id,
-          rewards_period: period,
-          balance,
-          rewards,
-          agg_rewards,
-          agg_rewards_change,
-        });
-        // update protocol gategory stat
-        await conn.update('protocol_category_stat', {
-          id: protocol_category_stat.id,
-          rewards_period: period,
-          agg_rewards: category_stat_agg_rewards,
-          agg_rewards_change: category_stat_agg_rewards_change,
-        });
-        // update protocol stat
-        await conn.update('protocol_stat', {
-          id: protocol_stat.id,
-          rewards_period: period,
-          agg_rewards: stat_agg_rewards,
-          agg_rewards_change: stat_agg_rewards_change,
-        });
-      }
-      const now_line_id = Util.convert_now_line_id(line_type, period);
-      // Update lines for different periods
-      if (now_line_id === period) {
-        // table name
-        const table_line_protocol = 'line_protocol_' + line_type;
-        const table_line_protocol_stat = 'line_protocol_stat_' + line_type;
-        const table_line_protocol_category_stat = 'line_protocol_category_stat_' + line_type;
-
-        const duration = DurationType[line_type].duration;
-        const line_id = now_line_id - duration;
-        // update line_protocol_stat
-        await conn.update(
-          table_line_protocol,
-          {
-            agg_rewards,
-            agg_rewards_change,
-          },
-          {
-            where: {
-              line_id,
-              name,
-            },
-          }
-        );
-
-        // update line_protocol_stat
-        await conn.update(
-          table_line_protocol_stat,
-          {
-            agg_rewards: stat_agg_rewards,
-            agg_rewards_change: stat_agg_rewards_change,
-          },
-          {
-            where: {
-              line_id,
-            },
-          }
-        );
-
-        // update line_protocol_category_stat
-        await conn.update(
-          table_line_protocol_category_stat,
-          {
-            agg_rewards: category_stat_agg_rewards,
-            agg_rewards_change: category_stat_agg_rewards_change,
-          },
-          {
-            where: {
-              category,
-              line_id,
-            },
-          }
-        );
-      }
+      // update line_protocol_category_stat
+      await conn.query(
+        `update ${table_line_protocol_category_stat} set agg_rewards=agg_rewards+?,agg_rewards_change=agg_rewards_change+? where line_id=? and category = ?`,
+        [rewards_change, rewards_change, line_id, category]
+      );
     }
   }
 
   /** ************************************************************** private function **********************************************/
-  /**
-   *
-   * @param {*} conn db connect
-   * @param {*} name   protocol name
-   * @param {*} category   protocol category
-   * @param {*} period current period
-   * @returns
-   */
-  async batchGetLastLines(conn, period, name, category) {
-    const last_period_line_ids = [];
-    const last_period_line_map = {};
-    for (const line_type of Constants.all_durations) {
-      const duration = DurationType[line_type].duration;
-      // Obtain the data week/1d/8h/10m ago for tvl_eos_change/tvl_usd_change
-      const last_period_line_id = period - duration - 600;
-      last_period_line_ids.push(last_period_line_id);
-      last_period_line_map[last_period_line_id] = { line_type };
-    }
-    (
-      await conn.query('select line_id,agg_rewards from line_protocol_10m where line_id in (?) and name = ?', [
-        last_period_line_ids,
-        name,
-      ])
-    ).forEach(s => {
-      last_period_line_map[s.line_id].last_period_protocol_agg_rewards = s;
-    });
-    (
-      await conn.query(
-        'select line_id,agg_rewards from line_protocol_category_stat_10m where line_id in (?) and category = ? ',
-        [last_period_line_ids, category]
-      )
-    ).forEach(s => {
-      last_period_line_map[s.line_id].last_period_protocol_category_stat = s;
-    });
-
-    (
-      await conn.query('select line_id,agg_rewards from line_protocol_stat_10m where line_id in (?) ', [
-        last_period_line_ids,
-      ])
-    ).forEach(s => {
-      last_period_line_map[s.line_id].last_period_protocol_stat = s;
-    });
-    return {
-      last_period_line_ids,
-      last_period_line_map,
-    };
-  }
   async updateStatusOrCategoryForProtocolStat(conn, protocol, is_add) {
     // update protocol stat
     const protocol_stat = await conn.get('protocol_stat');

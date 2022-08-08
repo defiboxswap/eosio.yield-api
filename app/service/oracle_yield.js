@@ -3,7 +3,6 @@
 const Service = require('egg').Service;
 const moment = require('moment');
 const Util = require('../lib/util');
-const ProtocolStatus = require('../lib/enums/protocol_status');
 const DurationType = require('../lib/enums/duration_type');
 const Constants = require('../lib/constants');
 /**
@@ -64,14 +63,15 @@ class OracleYieldService extends Service {
       if (line_type === 'day') {
         protocol_row.tvl_eos = result.protocol.tvl_eos;
         protocol_row.tvl_usd = result.protocol.tvl_usd;
+        protocol_row.agg_rewards_change = result.protocol.agg_rewards_change;
 
         protocol_category_stat_row.tvl_eos = result.protocol_category_stat.tvl_eos;
         protocol_category_stat_row.tvl_usd = result.protocol_category_stat.tvl_usd;
-        protocol_category_stat_row.agg_protocol_count = result.protocol_category_stat.agg_protocol_count;
+        protocol_category_stat_row.agg_rewards_change = result.protocol_category_stat.agg_rewards_change;
 
         protocol_stat_row.tvl_eos = result.protocol_stat.tvl_eos;
         protocol_stat_row.tvl_usd = result.protocol_stat.tvl_usd;
-        protocol_stat_row.agg_protocol_count = result.protocol_stat.agg_protocol_count;
+        protocol_stat_row.agg_rewards_change = result.protocol_stat.agg_rewards_change;
       }
     }
 
@@ -103,16 +103,16 @@ class OracleYieldService extends Service {
       last_period_line_map[last_period_line_id] = { line_type };
     }
     (
-      await conn.query('select line_id, tvl_eos, tvl_usd from line_protocol_10m where line_id in (?) and name = ?', [
-        last_period_line_ids,
-        name,
-      ])
+      await conn.query(
+        'select line_id, tvl_eos, tvl_usd, agg_rewards from line_protocol_10m where line_id in (?) and name = ?',
+        [last_period_line_ids, name]
+      )
     ).forEach(s => {
       last_period_line_map[s.line_id].last_period_protocol = s;
     });
     (
       await conn.query(
-        'select line_id, tvl_eos, tvl_usd from line_protocol_category_stat_10m where line_id in (?) and category = ? ',
+        'select line_id, tvl_eos, tvl_usd, agg_rewards from line_protocol_category_stat_10m where line_id in (?) and category = ? ',
         [last_period_line_ids, category]
       )
     ).forEach(s => {
@@ -121,7 +121,7 @@ class OracleYieldService extends Service {
 
     (
       await conn.query(
-        'select line_id, tvl_eos, tvl_usd from line_protocol_stat_10m where line_id in (?) ',
+        'select line_id, tvl_eos, tvl_usd, agg_rewards from line_protocol_stat_10m where line_id in (?) ',
         [last_period_line_ids]
       )
     ).forEach(s => {
@@ -162,6 +162,11 @@ class OracleYieldService extends Service {
     const tvl_eos_change = last_period_protocol ? Util.sub(tvl_eos, last_period_protocol.tvl_eos) : tvl_eos;
     const tvl_usd_change = last_period_protocol ? Util.sub(tvl_usd, last_period_protocol.tvl_usd) : tvl_usd;
 
+    const agg_rewards = protocol.agg_rewards;
+    const agg_rewards_change = last_period_protocol
+      ? Util.sub(agg_rewards, last_period_protocol.agg_rewards)
+      : agg_rewards;
+
     // update current protocol line
     const protocol_row = {
       name,
@@ -169,11 +174,18 @@ class OracleYieldService extends Service {
       tvl_usd,
       tvl_eos_change,
       tvl_usd_change,
+      agg_rewards,
+      agg_rewards_change,
     };
 
     // current stat data - last tvl + now tvl
     const stat_tvl_eos = Util.subAdd(protocol_stat.tvl_eos, last_tvl_eos, tvl_eos);
     const stat_tvl_usd = Util.subAdd(protocol_stat.tvl_usd, last_tvl_usd, tvl_usd);
+
+    const stat_agg_rewards = protocol_stat.agg_rewards;
+    const stat_agg_rewards_change = last_period_protocol_stat
+      ? Util.sub(stat_agg_rewards, last_period_protocol_stat.agg_rewards)
+      : stat_agg_rewards;
 
     const stat_agg_protocol_count = protocol_stat.agg_protocol_count;
 
@@ -191,12 +203,19 @@ class OracleYieldService extends Service {
       tvl_usd: stat_tvl_usd,
       tvl_eos_change: stat_tvl_eos_change,
       tvl_usd_change: stat_tvl_usd_change,
+      agg_rewards: stat_agg_rewards,
+      agg_rewards_change: stat_agg_rewards_change,
       agg_protocol_count: stat_agg_protocol_count,
     };
 
     // current stat data - last tvl + now tvl
     const category_stat_tvl_eos = Util.subAdd(protocol_category_stat.tvl_eos, last_tvl_eos, tvl_eos);
     const category_stat_tvl_usd = Util.subAdd(protocol_category_stat.tvl_usd, last_tvl_usd, tvl_usd);
+
+    const category_stat_agg_rewards = protocol_category_stat.agg_rewards;
+    const category_stat_agg_rewards_change = last_period_protocol_category_stat
+      ? Util.sub(category_stat_agg_rewards, last_period_protocol_category_stat.agg_rewards)
+      : category_stat_agg_rewards;
 
     const category_stat_agg_protocol_count = protocol_category_stat.agg_protocol_count;
 
@@ -215,6 +234,8 @@ class OracleYieldService extends Service {
       tvl_usd: category_stat_tvl_usd,
       tvl_eos_change: category_tvl_eos_change,
       tvl_usd_change: category_tvl_usd_change,
+      agg_rewards: category_stat_agg_rewards,
+      agg_rewards_change: category_stat_agg_rewards_change,
       agg_protocol_count: category_stat_agg_protocol_count,
     };
 
