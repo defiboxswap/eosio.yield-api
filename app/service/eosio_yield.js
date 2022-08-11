@@ -20,10 +20,11 @@ class EosioYieldService extends Service {
     // carete protocol
     const row = {
       name,
+      category,
       metadata_name,
       metadata: JSON.stringify(metadata),
-      category,
       contracts: JSON.stringify([name]),
+      evm: '[]',
       status: status,
       is_delete: 0,
       create_at: moment(moment(action.timestamp).format('YYYY-MM-DD HH:mm:ss+00:00')).unix(),
@@ -37,14 +38,14 @@ class EosioYieldService extends Service {
     }
 
     // add stat row
-    const protocol_stat = await conn.get('protocol_stat');
-    if (!protocol_stat) {
+    let count = await conn.count('protocol_stat');
+    if (count === 0) {
       await conn.insert('protocol_stat', {});
     }
 
     // add category stat row
-    const protocol_category_stat = await conn.get('protocol_category_stat', { category });
-    if (!protocol_category_stat) {
+    count = await conn.count('protocol_category_stat', { category });
+    if (count === 0) {
       await conn.insert('protocol_category_stat', { category });
     }
   }
@@ -178,7 +179,7 @@ class EosioYieldService extends Service {
     const balance = parseFloat(data.balance);
     const rewards = parseFloat(data.rewards);
     const period = moment(data.period + '+00:00').unix();
-    if(rewards === 0) return;
+    if (rewards === 0) return;
     //irreversible handle
     let rewards_change = rewards;
     if (period.rewards_period === period) {
