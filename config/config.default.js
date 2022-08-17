@@ -14,9 +14,19 @@ module.exports = appInfo => {
 
   config.multipart = {
     mode: 'file',
-    whitelist: [ '.png' ],
+    whitelist: [
+      '.jpg',
+      '.jpeg', // image/jpeg
+      '.png', // image/png, image/x-png
+      '.gif', // image/gif
+      '.bmp', // image/bmp
+      '.wbmp', // image/vnd.wap.wbmp
+      '.webp',
+      '.tif',
+      '.psd',
+      '.svg',
+    ],
     fileSize: '2mb',
-    fieldSize: '1024kb',
     files: 1,
   };
 
