@@ -11,7 +11,7 @@ class IpfsController extends BaseController {
    * @Summary Upload logo.
    * @Router post /v1/ipfs/logo
    * @consume multipart/form-data
-   * @Request formData file *file logo file
+   * @Request formData file *file (logo file <br> only the .jpg .jpeg .png .gif .webp format is supported)
    * @response 200 ipfs_result resp
    **/
   async logo() {
@@ -42,7 +42,7 @@ class IpfsController extends BaseController {
       });
       if (result.status !== 200) {
         super.error(result.status, result.data.error);
-      }else {
+      } else {
         super.success({
           ipfs_hash: result.data.IpfsHash,
           pin_size: result.data.PinSize,
@@ -54,7 +54,7 @@ class IpfsController extends BaseController {
       super.error(ErrorCode.timeout.code, ErrorCode.timeout.msg);
     } finally {
       // Delete temporary files
-      fs.unlink(file.filepath, ()=>{});
+      fs.unlink(file.filepath, () => {});
     }
   }
 }
