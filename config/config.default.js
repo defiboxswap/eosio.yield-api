@@ -16,15 +16,11 @@ module.exports = appInfo => {
     mode: 'file',
     whitelist: [
       '.jpg',
-      '.jpeg', // image/jpeg
-      '.png', // image/png, image/x-png
-      '.gif', // image/gif
-      '.bmp', // image/bmp
-      '.wbmp', // image/vnd.wap.wbmp
-      '.webp',
-      '.tif',
-      '.psd',
-      '.svg',
+      '.jpeg',
+      '.png', 
+      // animations
+      '.gif', 
+      '.webp'
     ],
     fileSize: '2mb',
     files: 1,
