@@ -1,13 +1,12 @@
 'use strict';
-const LRU = require('lru-cache')
+const LRU = require('lru-cache');
 const { sleep } = require('./app/lib/util');
-
 
 class AppBootHook {
   constructor(app) {
     this.app = app;
   }
-  
+
   async didLoad() {
     const { app } = this;
     // init lru cache
@@ -16,17 +15,15 @@ class AppBootHook {
     }
   }
 
-  async didReady() {
+  async serverDidReady() {
     const { app } = this;
-    app.logger.info('===>>> app.js didReady');
+    app.logger.info('===>>> app.js serverDidReady');
     app.logger.info('http://127.0.0.1:5051/swagger-ui.html');
-    app.globalStatus = 1;
   }
 
   async beforeClose() {
-    const { ctx, app } = this;
+    const { app } = this;
     app.logger.info('===>>> app.js beforeClose');
-    app.globalStatus = 0;
     await sleep(2000);
   }
 }

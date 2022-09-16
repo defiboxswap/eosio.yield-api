@@ -4,25 +4,25 @@ const Subscription = require('egg').Subscription;
 const process_status = require('../lib/enums/process_status');
 const params_keys = require('../lib/enums/params_keys');
 const sync_status = require('../lib/enums/sync_status');
-const { camelProp, sleep } = require('../lib/util');
+const { camelProp } = require('../lib/util');
 
 let local_status = sync_status.start;
 
 class history_sync extends Subscription {
   static get schedule() {
     return {
+      interval: '1s',
       type: 'worker',
       disable: false,
-      immediate: true,
+      immediate: false,
     };
   }
 
   async subscribe() {
-    const { app, ctx } = this;
+    const { ctx } = this;
+    if (local_status !== sync_status.start) return;
     const yield_db = ctx.app.mysql.get('yield');
     const history_db = ctx.app.mysql.get('history');
-    if (app.globalStatus === 0 || local_status !== sync_status.start) return;
-
     try {
       local_status = sync_status.processing;
       const param = await yield_db.get('params', { key: params_keys.history_sync_status });
@@ -31,7 +31,7 @@ class history_sync extends Subscription {
       // get unprocessed events
       const events = await history_db.query(
         'select id, act_ids, status, type from dex_events where status in (?) limit 300',
-        [[process_status.unprocessed, process_status.being_processed]]
+        [[ process_status.unprocessed, process_status.being_processed ]]
       );
       if (events.length === 0) return;
       for (const event of events) {
@@ -46,7 +46,7 @@ class history_sync extends Subscription {
         // get actions
         const actions = await history_db.query(
           'select id, account, name, timestamp, data from dex_actions where id in (?)',
-          [act_ids]
+          [ act_ids ]
         );
         await yield_db.beginTransactionScope(async conn => {
           for (const action of actions) {
@@ -67,24 +67,10 @@ class history_sync extends Subscription {
     } catch (e) {
       ctx.logger.error('history sync error：', e);
       local_status = sync_status.stop;
-      await yield_db.update(
-        'params',
-        {
-          value: local_status,
-        },
-        {
-          where: {
-            key: params_keys.history_sync_status,
-          },
-        }
-      );
+      await yield_db.query('update params set value=? where key = ?', [ local_status, params_keys.history_sync_status ]);
     } finally {
       if (local_status === sync_status.processing) local_status = sync_status.start;
       ctx.logger.info('end history_sync');
-      if (app.globalStatus === 1) {
-        await sleep(1000);
-        await app.runSchedule('history_sync.js');
-      }
     }
   }
 }
