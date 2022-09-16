@@ -18,7 +18,7 @@ class EchartController extends BaseController {
   async list() {
     const { ctx } = this;
     const rules = {
-      tvl_type: { type: 'enum', trim: true, required: true, values: ['tvl_usd', 'tvl_eos'] },
+      tvl_type: { type: 'enum', trim: true, required: true, values: [ 'tvl_usd', 'tvl_eos' ] },
       line_type: { type: 'enum', required: true, trim: true, values: Constatns.skip_10m_durations },
       duration: { type: 'number', required: false, convertType: 'number' },
     };
@@ -45,7 +45,7 @@ class EchartController extends BaseController {
   async category_stat_list() {
     const { ctx } = this;
     const rules = {
-      tvl_type: { type: 'enum', trim: true, required: true, values: ['tvl_usd', 'tvl_eos'] },
+      tvl_type: { type: 'enum', trim: true, required: true, values: [ 'tvl_usd', 'tvl_eos' ] },
       line_type: { type: 'enum', required: true, trim: true, values: Constatns.skip_10m_durations },
       duration: { type: 'number', required: false, convertType: 'number' },
     };

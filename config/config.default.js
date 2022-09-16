@@ -17,10 +17,10 @@ module.exports = appInfo => {
     whitelist: [
       '.jpg',
       '.jpeg',
-      '.png', 
+      '.png',
       // animations
-      '.gif', 
-      '.webp'
+      '.gif',
+      '.webp',
     ],
     fileSize: '2mb',
     files: 1,

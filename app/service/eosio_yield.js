@@ -23,9 +23,9 @@ class EosioYieldService extends Service {
       category,
       metadata_name,
       metadata: JSON.stringify(metadata),
-      contracts: JSON.stringify([name]),
+      contracts: JSON.stringify([ name ]),
       evm: '[]',
-      status: status,
+      status,
       is_delete: 0,
       create_at: moment(moment(action.timestamp).format('YYYY-MM-DD HH:mm:ss+00:00')).unix(),
     };
@@ -107,7 +107,7 @@ class EosioYieldService extends Service {
       await this.updateStatusOrCategoryForProtocolStat(conn, protocol, true);
       await this.updateStatusOrCategoryForProtocolCategoryStat(conn, protocol, protocol.category, true);
     }
-    //active ==> pending/denied
+    // active ==> pending/denied
     if (
       protocol.status === ProtocolStatus.active &&
       (status === ProtocolStatus.pending || status === ProtocolStatus.denied)
@@ -180,10 +180,10 @@ class EosioYieldService extends Service {
     const rewards = parseFloat(data.rewards);
     const period = moment(data.period + '+00:00').unix();
     if (rewards === 0) return;
-    //irreversible handle
+    // irreversible handle
     let rewards_change = rewards;
     if (period.rewards_period === period) {
-      const protocol = await conn.queryOne('select rewards from protocol where name = ?', [name]);
+      const protocol = await conn.queryOne('select rewards from protocol where name = ?', [ name ]);
       rewards_change = Util.sub(protocol.rewards, rewards);
       if (rewards_change === 0) return;
     }
@@ -191,17 +191,17 @@ class EosioYieldService extends Service {
     // update protocol
     await conn.query(
       'update protocol set balance=?,rewards=?,rewards_period = ?,agg_rewards=agg_rewards + ?,agg_rewards_change=agg_rewards_change + ? where name = ?',
-      [balance, rewards, period, rewards_change, rewards_change, name]
+      [ balance, rewards, period, rewards_change, rewards_change, name ]
     );
     // update protocol gategory stat
     await conn.query(
       'update protocol_category_stat set rewards_period = ?,agg_rewards=agg_rewards + ?,agg_rewards_change=agg_rewards_change + ? where category=?',
-      [period, rewards_change, rewards_change, category]
+      [ period, rewards_change, rewards_change, category ]
     );
     // update protocol stat
     await conn.query(
       'update protocol_stat set rewards_period = ?,agg_rewards=agg_rewards + ?,agg_rewards_change=agg_rewards_change + ?',
-      [period, rewards_change, rewards_change]
+      [ period, rewards_change, rewards_change ]
     );
 
     for (const line_type of Constants.all_durations) {
@@ -214,19 +214,19 @@ class EosioYieldService extends Service {
       // update line_protocol_stat
       await conn.query(
         `update ${table_line_protocol} set agg_rewards=agg_rewards+?,agg_rewards_change=agg_rewards_change+? where line_id=? and name = ?`,
-        [rewards_change, rewards_change, line_id, name]
+        [ rewards_change, rewards_change, line_id, name ]
       );
 
       // update line_protocol_stat
       await conn.query(
         `update ${table_line_protocol_stat} set agg_rewards=agg_rewards+?,agg_rewards_change=agg_rewards_change+? where line_id=?`,
-        [rewards_change, rewards_change, line_id]
+        [ rewards_change, rewards_change, line_id ]
       );
 
       // update line_protocol_category_stat
       await conn.query(
         `update ${table_line_protocol_category_stat} set agg_rewards=agg_rewards+?,agg_rewards_change=agg_rewards_change+? where line_id=? and category = ?`,
-        [rewards_change, rewards_change, line_id, category]
+        [ rewards_change, rewards_change, line_id, category ]
       );
     }
   }

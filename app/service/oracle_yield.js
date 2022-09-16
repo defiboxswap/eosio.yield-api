@@ -29,15 +29,15 @@ class OracleYieldService extends Service {
 
     const { last_period_line_ids, last_period_line_map } = await this.batchGetLastLines(conn, period, name, category);
 
-    let protocol_row = {
+    const protocol_row = {
       id: protocol.id,
       period,
     };
-    let protocol_category_stat_row = {
+    const protocol_category_stat_row = {
       id: protocol_category_stat.id,
       period,
     };
-    let protocol_stat_row = {
+    const protocol_stat_row = {
       id: protocol_stat.id,
       period,
     };
@@ -90,7 +90,7 @@ class OracleYieldService extends Service {
    * @param {*} name   protocol name
    * @param {*} category   protocol category
    * @param {*} period current period
-   * @returns
+   * @return
    */
   async batchGetLastLines(conn, period, name, category) {
     const last_period_line_ids = [];
@@ -105,7 +105,7 @@ class OracleYieldService extends Service {
     (
       await conn.query(
         'select line_id, tvl_eos, tvl_usd, agg_rewards from line_protocol_10m where line_id in (?) and name = ?',
-        [last_period_line_ids, name]
+        [ last_period_line_ids, name ]
       )
     ).forEach(s => {
       last_period_line_map[s.line_id].last_period_protocol = s;
@@ -113,7 +113,7 @@ class OracleYieldService extends Service {
     (
       await conn.query(
         'select line_id, tvl_eos, tvl_usd, agg_rewards from line_protocol_category_stat_10m where line_id in (?) and category = ? ',
-        [last_period_line_ids, category]
+        [ last_period_line_ids, category ]
       )
     ).forEach(s => {
       last_period_line_map[s.line_id].last_period_protocol_category_stat = s;
@@ -122,7 +122,7 @@ class OracleYieldService extends Service {
     (
       await conn.query(
         'select line_id, tvl_eos, tvl_usd, agg_rewards from line_protocol_stat_10m where line_id in (?) ',
-        [last_period_line_ids]
+        [ last_period_line_ids ]
       )
     ).forEach(s => {
       last_period_line_map[s.line_id].last_period_protocol_stat = s;

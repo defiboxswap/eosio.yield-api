@@ -1,8 +1,8 @@
 'use strict';
 
 module.exports = {
-  timeout:{
+  timeout: {
     code: 408,
-    msg: 'timeout please retry'
+    msg: 'timeout please retry',
   },
 };

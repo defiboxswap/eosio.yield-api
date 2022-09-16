@@ -21,22 +21,22 @@ class ProtocolsController extends BaseController {
     const { app, ctx } = this;
     const db = app.mysql.get('yield');
     const rules = {
-      pageNo: { type: 'number', required: false, min:1 },
+      pageNo: { type: 'number', required: false, min: 1 },
       pageSize: { type: 'number', required: false, max: 300 },
       search: { type: 'string', trim: true, required: false },
       category: { type: 'string', trim: true, required: false },
-      status: { type: 'enum', trim: true, required: false, values: ['pending', 'active', 'denied'] },
+      status: { type: 'enum', trim: true, required: false, values: [ 'pending', 'active', 'denied' ] },
       order_column: {
         type: 'enum',
         trim: true,
         required: false,
-        values: ['tvl_usd', 'tvl_usd_change_8h', 'tvl_usd_change_day', 'tvl_usd_change_week', 'tvl_eos', 'tvl_eos_change_8h', 'tvl_eos_change_day', 'tvl_eos_change_week','agg_rewards', 'create_at'],
+        values: [ 'tvl_usd', 'tvl_usd_change_8h', 'tvl_usd_change_day', 'tvl_usd_change_week', 'tvl_eos', 'tvl_eos_change_8h', 'tvl_eos_change_day', 'tvl_eos_change_week', 'agg_rewards', 'create_at' ],
       },
       order_type: {
         type: 'enum',
         trim: true,
         required: false,
-        values: ['asc', 'desc'],
+        values: [ 'asc', 'desc' ],
       },
     };
     const params = {
@@ -94,7 +94,7 @@ class ProtocolsController extends BaseController {
     if (data) {
       const rankResult = await db.queryOne(
         'select count(*) + 1 rank from protocol where is_delete = 0 and tvl_eos > ?',
-        [data.tvl_eos]
+        [ data.tvl_eos ]
       );
       data.rank = rankResult.rank;
     }
@@ -158,7 +158,7 @@ class ProtocolsController extends BaseController {
   async sparkline() {
     const { app, ctx } = this;
     const rules = {
-      tvl_type: { type: 'enum', trim: true, required: true, values: ['tvl_usd', 'tvl_eos'] },
+      tvl_type: { type: 'enum', trim: true, required: true, values: [ 'tvl_usd', 'tvl_eos' ] },
       name: { type: 'string', required: true },
     };
     const params = {
