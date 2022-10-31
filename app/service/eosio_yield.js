@@ -182,8 +182,8 @@ class EosioYieldService extends Service {
     if (rewards === 0) return;
     // irreversible handle
     let rewards_change = rewards;
-    if (period.rewards_period === period) {
-      const protocol = await conn.queryOne('select rewards from protocol where name = ?', [ name ]);
+    const protocol = await conn.queryOne('select rewards,rewards_period from protocol where name = ?', [ name ]);
+    if (protocol.rewards_period === period) {
       rewards_change = Util.sub(protocol.rewards, rewards);
       if (rewards_change === 0) return;
     }
@@ -209,8 +209,7 @@ class EosioYieldService extends Service {
       const table_line_protocol = 'line_protocol_' + line_type;
       const table_line_protocol_stat = 'line_protocol_stat_' + line_type;
       const table_line_protocol_category_stat = 'line_protocol_category_stat_' + line_type;
-
-      const line_id = Util.convert_last_line_id(line_type, period);
+      const line_id = Util.convert_now_line_id(line_type, period);
       // update line_protocol_stat
       await conn.query(
         `update ${table_line_protocol} set agg_rewards=agg_rewards+?,agg_rewards_change=agg_rewards_change+? where line_id=? and name = ?`,
