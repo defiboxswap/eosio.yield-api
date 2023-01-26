@@ -106,4 +106,11 @@ module.exports = {
     timestamp: { type: 'string', description: 'The timestamp', example: '2022-07-26T06:55:45.942Z' },
     is_duplicate: { type: 'boolean', description: 'The duplicate upload status', example: true },
   },
+  report: {
+    id: { type: 'number', description: 'The report id', example: 1 },
+    title: { type: 'string', description: 'Report title', example: 'November 2022 Yield+ Report' },
+    url: { type: 'string', description: 'Report detail link', example: '"https://eosnetwork.com/blog/november-2022-yield-report/' },
+    image: { type: 'string', description: 'Report image', example: 'https://eosnetwork.com/wp-content/uploads/2022/12/Yield_Report_November-1024x512.png' },
+    remark: { type: 'string', description: 'The remark', example: '' },
+  },
 };

@@ -20,3 +20,5 @@ config/config.local.js
 config/config.test.js
 config/config.prod.js
 .history/
+
+.vscode/

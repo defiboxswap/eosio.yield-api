@@ -22,4 +22,6 @@ module.exports = app => {
   router.get('/v1/echart/lines/:line_type/categorystats', controller.v1.echart.category_stat_list);
 
   router.post('/v1/ipfs/logo', controller.v1.ipfs.logo);
+
+  router.get('/v1/reports', controller.v1.reports.report_page);
 };

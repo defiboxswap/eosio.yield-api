@@ -7,6 +7,7 @@
     "declarations": true
   },
   "dependencies": {
+    "crawler": "^1.4.0",
     "decimal.js": "^10.3.1",
     "egg": "^2.15.1",
     "egg-cors": "^2.2.3",

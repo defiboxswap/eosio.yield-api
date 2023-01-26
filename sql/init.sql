@@ -365,3 +365,12 @@ INSERT INTO `yield`.`chain_node` VALUES (14, 'eos', 'aca376f206b8fc25a6ed44dbdc6
 INSERT INTO `yield`.`chain_node` VALUES (15, 'eos', 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906' , 'https://api-mainnet.starteos.io', 'Hongkong', 23, 1, 0, NULL, 'en,zh_CN,zh_TW,ko');
 INSERT INTO `yield`.`chain_node` VALUES (16, 'eos', 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906' , 'https://eos.defibox.xyz', 'Japan', 20, 1, 1, NULL, NULL);
 
+DROP TABLE IF EXISTS `report`;
+CREATE TABLE `report` (
+  `id` bigint(20) NOT NULL COMMENT 'id',
+  `title` varchar(256) NOT NULL DEFAULT '' COMMENT 'report title',
+  `url` varchar(1024) NOT NULL COMMENT 'report url',
+  `image` varchar(1024) NOT NULL COMMENT 'report image url',
+  `remark` varchar(1024) DEFAULT NULL COMMENT 'remark',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
