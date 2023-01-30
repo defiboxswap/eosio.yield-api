@@ -111,6 +111,8 @@ module.exports = {
     title: { type: 'string', description: 'Report title', example: 'November 2022 Yield+ Report' },
     url: { type: 'string', description: 'Report detail link', example: 'https://eosnetwork.com/blog/november-2022-yield-report/' },
     image: { type: 'string', description: 'Report image', example: 'https://eosnetwork.com/wp-content/uploads/2022/12/Yield_Report_November-1024x512.png' },
+    laste_reading: { type: 'string', description: 'laste reading time', example: '3 min read' },
+    create_at: { type: 'string', description: 'date created', example: 'Dec 13' },
     remark: { type: 'string', description: 'The remark', example: '' },
   },
 };

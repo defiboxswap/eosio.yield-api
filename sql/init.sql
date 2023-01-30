@@ -372,5 +372,7 @@ CREATE TABLE `report` (
   `url` varchar(1024) NOT NULL COMMENT 'report url',
   `image` varchar(1024) NOT NULL COMMENT 'report image url',
   `remark` varchar(1024) DEFAULT '' COMMENT 'remark',
+  `laste_reading` varchar(128) DEFAULT NULL COMMENT 'laste reading',
+  `create_at` varchar(128) DEFAULT NULL COMMENT 'date created',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
